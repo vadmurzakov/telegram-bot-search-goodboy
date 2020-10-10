@@ -1,0 +1,15 @@
+{
+  "groups": [
+    {
+      "name": "telegram",
+      "type": "java.lang.String"
+    }
+  ],
+  "properties": [
+    {
+      "name": "telegram.token",
+      "type": "java.lang.String",
+      "description": "Token for TelegramBot."
+    }
+  ]
+}

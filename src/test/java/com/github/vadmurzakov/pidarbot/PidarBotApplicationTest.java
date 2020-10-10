@@ -4,10 +4,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 @SpringBootTest
-class PidarBotApplicationTests {
+class PidarBotApplicationTest {
 
     @Test
-    void contextLoads() {
+    public void contextLoads() {
+    }
+
+    @Test
+    public void main() {
+        PidarBotApplication.main(new String[0]);
     }
 
 }
