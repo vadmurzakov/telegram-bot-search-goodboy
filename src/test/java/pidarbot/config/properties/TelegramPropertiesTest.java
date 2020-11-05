@@ -1,4 +1,4 @@
-package com.github.vadmurzakov.pidarbot.config.properties;
+package pidarbot.config.properties;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

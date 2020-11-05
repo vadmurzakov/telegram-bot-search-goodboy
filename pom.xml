@@ -8,7 +8,7 @@
         <version>2.3.4.RELEASE</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
-    <groupId>com.github.vadmurzakov</groupId>
+    <groupId>ru.github.vadmurzakov</groupId>
     <artifactId>pidar-bot</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>pidar-bot</name>
@@ -59,9 +59,9 @@
             </exclusions>
         </dependency>
         <dependency>
-            <groupId>com.github.vadmurzakov</groupId>
+            <groupId>com.github.pengrad</groupId>
             <artifactId>java-telegram-bot-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>4.9.0</version>
         </dependency>
     </dependencies>
 
