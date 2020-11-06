@@ -40,7 +40,7 @@ public class StatsProviders implements CommandProviders {
         //todo[vmurzakov]: отрефакторить дублирование кода
         msg.append("Результаты Пидор-Дня\n");
         for (int i = 0; i < statsList.size(); i++) {
-            Stats stats = statsList.get(0);
+            Stats stats = statsList.get(i);
             User user = userService.findByUserId(stats.getUserId());
             msg.append(i + 1).append(") ").append(user.getFullName()).append(" ");
             if (StringUtils.isNotEmpty(user.getUsername())) {
@@ -51,7 +51,7 @@ public class StatsProviders implements CommandProviders {
 
         msg.append("\nРезультаты Красаучик-Дня\n");
         for (int i = 0; i < statsList.size(); i++) {
-            Stats stats = statsList.get(0);
+            Stats stats = statsList.get(i);
             User user = userService.findByUserId(stats.getUserId());
             msg.append(i + 1).append(") ").append(user.getFullName()).append(" ");
             if (StringUtils.isNotEmpty(user.getUsername())) {
