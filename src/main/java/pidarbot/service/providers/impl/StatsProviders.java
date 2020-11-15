@@ -15,7 +15,9 @@ import pidarbot.service.business.StatsService;
 import pidarbot.service.business.UserService;
 import pidarbot.service.providers.CommandProviders;
 
+import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Component
@@ -36,6 +38,8 @@ public class StatsProviders implements CommandProviders {
         log.info("Запрос статистики в чате {}", chatId);
         List<Stats> statsList = statsService.findStats(chatId);
 
+        statsList = statsList.stream().sorted(Comparator.comparingLong(Stats::getCountPidrDay).reversed()).collect(Collectors.toList());
+
         StringBuilder msg = new StringBuilder();
         //todo[vmurzakov]: отрефакторить дублирование кода
         msg.append("Результаты Пидор-Дня\n");
@@ -48,6 +52,8 @@ public class StatsProviders implements CommandProviders {
             }
             msg.append(stats.getCountPidrDay()).append(" раз(а)\n");
         }
+
+        statsList = statsList.stream().sorted(Comparator.comparingLong(Stats::getCountGoodBoy).reversed()).collect(Collectors.toList());
 
         msg.append("\nРезультаты Красаучик-Дня\n");
         for (int i = 0; i < statsList.size(); i++) {
