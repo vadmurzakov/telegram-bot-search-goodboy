@@ -66,7 +66,7 @@ public class StatsProviders implements CommandProviders {
             msg.append(stats.getCountGoodBoy()).append(" раз(а)\n");
         }
 
-        SendMessage sendMessage = new SendMessage(chatId, msg.toString());
+        SendMessage sendMessage = new SendMessage(chatId, msg.toString()).replyToMessageId(message.messageId());
         telegramBot.execute(sendMessage);
     }
 }

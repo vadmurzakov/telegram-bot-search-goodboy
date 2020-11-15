@@ -49,7 +49,7 @@ public class PidorProviders implements CommandProviders {
 
         String msg = "Сегодня Пидор-Дня: " + user.getFullName() + " (";
         if (StringUtils.isNotEmpty(user.getUsername())) msg += "@" + user.getUsername() + ")";
-        SendMessage sendMessage = new SendMessage(chatId, msg);
+        SendMessage sendMessage = new SendMessage(chatId, msg).replyToMessageId(message.messageId());
         telegramBot.execute(sendMessage);
     }
 
