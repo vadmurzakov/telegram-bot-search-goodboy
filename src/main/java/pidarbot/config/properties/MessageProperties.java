@@ -27,8 +27,7 @@ public class MessageProperties {
 
         this.goodBoy = Arrays.asList(
                 "{0}, хороший мальчик",
-                "Молодцом {0}",
-                "{0}, not bat"
+                "Красавчик-Дня {0}"
         );
     }
 }

@@ -7,6 +7,8 @@ import pidarbot.entity.domain.Stats;
 import pidarbot.entity.enums.CommandBotEnum;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Murzakov Vadim <murzakov.vadim@otr.ru>
@@ -36,5 +38,18 @@ public class GoodBoyProviders extends AbstractGameProviders {
     @Override
     protected LocalDate getLastDayRunGame(Stats stats) {
         return stats.getLastDayGoodBoy();
+    }
+
+    @Override
+    protected List<Stats> filterStats(List<Stats> statsList) {
+        return statsList.stream()
+                .filter(e -> {
+                    if (e.getLastDayPidr() == null) {
+                        return true;
+                    } else {
+                        return LocalDate.now().compareTo(e.getLastDayPidr()) != 0;
+                    }
+                })
+                .collect(Collectors.toList());
     }
 }

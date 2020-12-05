@@ -40,6 +40,8 @@ public abstract class AbstractGameProviders implements CommandProviders {
 
         if(CollectionUtils.isEmpty(statsList)) return;
 
+        statsList = filterStats(statsList);
+
         int randomNumber = generateRandomNumber(statsList.size());
         Stats stats = statsList.get(randomNumber - 1);
         incrementCount(stats);
@@ -52,6 +54,12 @@ public abstract class AbstractGameProviders implements CommandProviders {
         SendMessage sendMessage = new SendMessage(chatId, msg).replyToMessageId(message.messageId());
         telegramBot.execute(sendMessage);
     }
+
+    /**
+     * исключить из выборки тех, кто сегодня уже взял какую-то награду: пидора или красавчика
+     * @param statsList - статистика всех кто учавствует в игре
+     */
+    protected abstract List<Stats> filterStats(List<Stats> statsList);
 
     /**
      * Проверить запускался ли бот сегодня, чтобы не искать данные повторно
