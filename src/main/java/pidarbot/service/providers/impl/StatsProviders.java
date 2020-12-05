@@ -3,7 +3,6 @@ package pidarbot.service.providers.impl;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
-import liquibase.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -47,9 +46,6 @@ public class StatsProviders implements CommandProviders {
             Stats stats = statsList.get(i);
             User user = userService.findByUserId(stats.getUserId());
             msg.append(i + 1).append(") ").append(user.getFullName()).append(" ");
-            if (StringUtils.isNotEmpty(user.getUsername())) {
-                msg.append("(@").append(user.getUsername()).append(") - ");
-            }
             msg.append(stats.getCountPidrDay()).append(" раз(а)\n");
         }
 
@@ -60,9 +56,6 @@ public class StatsProviders implements CommandProviders {
             Stats stats = statsList.get(i);
             User user = userService.findByUserId(stats.getUserId());
             msg.append(i + 1).append(") ").append(user.getFullName()).append(" ");
-            if (StringUtils.isNotEmpty(user.getUsername())) {
-                msg.append("(@").append(user.getUsername()).append(") - ");
-            }
             msg.append(stats.getCountGoodBoy()).append(" раз(а)\n");
         }
 

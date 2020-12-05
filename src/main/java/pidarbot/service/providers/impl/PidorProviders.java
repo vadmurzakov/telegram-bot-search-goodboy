@@ -1,59 +1,40 @@
 package pidarbot.service.providers.impl;
 
-import com.pengrad.telegrambot.TelegramBot;
-import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.request.SendMessage;
-import liquibase.util.StringUtils;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import pidarbot.entity.domain.Stats;
-import pidarbot.entity.domain.User;
 import pidarbot.entity.enums.CommandBotEnum;
-import pidarbot.service.business.StatsService;
-import pidarbot.service.business.UserService;
-import pidarbot.service.providers.CommandProviders;
 
-import java.util.List;
+import java.time.LocalDate;
 
 /**
  * @author Murzakov Vadim <murzakov.vadim@otr.ru>
  */
-@Slf4j
 @Component
 @Transactional
 @RequiredArgsConstructor
-public class PidorProviders implements CommandProviders {
-    private final StatsService statsService;
-    private final UserService userService;
-    private final TelegramBot telegramBot;
+public class PidorProviders extends AbstractGameProviders {
+    private final MessageService messageService;
 
     @Override
     public CommandBotEnum getCommand() {
         return CommandBotEnum.PIDR;
     }
 
-    public void execute(Message message) {
-        Long chatId = message.chat().id();
-        List<Stats> statsList = statsService.findStats(chatId);
-        log.info("В игре Пидр-Дня из чата {}, учавствуют {} игроков", chatId, statsList.size());
-
-        if(statsList.size() == 0) return;
-
-        int randomNumber = generateRandomNumber(statsList.size());
-        Stats stats = statsList.get(randomNumber - 1);
-        stats.setCountPidrDay(stats.getCountPidrDay() + 1);
-
-        User user = userService.findByUserId(stats.getUserId());
-
-        String msg = "Сегодня Пидор-Дня: " + user.getFullName() + " (";
-        if (StringUtils.isNotEmpty(user.getUsername())) msg += "@" + user.getUsername() + ")";
-        SendMessage sendMessage = new SendMessage(chatId, msg).replyToMessageId(message.messageId());
-        telegramBot.execute(sendMessage);
+    @Override
+    protected String getFormatMessageService() {
+        return messageService.randomPidrMessage();
     }
 
-    private int generateRandomNumber(int max) {
-        return 1 + (int) (Math.random() * max);
+    @Override
+    protected void incrementCount(Stats stats) {
+        stats.setCountPidrDay(stats.getCountPidrDay() + 1);
+        stats.setLastDayPidr(LocalDate.now());
+    }
+
+    @Override
+    protected LocalDate getLastDayRunGame(Stats stats) {
+        return stats.getLastDayPidr();
     }
 }

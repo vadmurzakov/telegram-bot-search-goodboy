@@ -8,5 +8,6 @@
     <include file="01-create_schema.xml" relativeToChangelogFile="true"/>
     <include file="02-create_table_stats.xml" relativeToChangelogFile="true"/>
     <include file="03-create_table_user.xml" relativeToChangelogFile="true"/>
+    <include file="04-update_table_stats.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

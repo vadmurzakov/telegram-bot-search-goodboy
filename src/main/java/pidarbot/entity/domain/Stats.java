@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 
 import static javax.persistence.GenerationType.SEQUENCE;
 
@@ -25,6 +26,8 @@ public class Stats {
     private boolean active;
     private Long countPidrDay;
     private Long countGoodBoy;
+    private LocalDate lastDayPidr;
+    private LocalDate lastDayGoodBoy;
 
     public Stats(Long chatId, Long userId) {
         this.chatId = chatId;

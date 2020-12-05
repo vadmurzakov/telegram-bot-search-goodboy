@@ -1,5 +1,6 @@
 package pidarbot.entity.domain;
 
+import liquibase.util.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -29,6 +30,10 @@ public class User {
     private String lastName;
 
     public String getFullName() {
-        return this.firstName + " " + this.lastName;
+        String fullName = this.firstName + " " + this.lastName;
+        if (StringUtils.isNotEmpty(this.getUsername())){
+            fullName += " (@" + this.getUsername() + ")";
+        }
+        return fullName;
     }
 }

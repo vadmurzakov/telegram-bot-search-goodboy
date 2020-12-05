@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="05.12.2020-1" author="vmurzakov">
+        <addColumn schemaName="vm_pidar_adm" tableName="stats">
+            <column name="last_day" type="DATE" remarks="Дата когда последний раз был красавчиком или пидаром"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="05.12.2020-2" author="vmurzakov">
+        <dropColumn schemaName="vm_pidar_adm" tableName="stats" columnName="last_day"/>
+    </changeSet>
+
+    <changeSet id="05.12.2020-3" author="vmurzakov">
+        <addColumn schemaName="vm_pidar_adm" tableName="stats">
+            <column name="last_day_pidr" type="DATE" remarks="Дата когда последний раз был пидаром"/>
+        </addColumn>
+    </changeSet>
+
+    <changeSet id="05.12.2020-4" author="vmurzakov">
+        <addColumn schemaName="vm_pidar_adm" tableName="stats">
+            <column name="last_day_good_boy" type="DATE" remarks="Дата когда последний раз был красавчиком"/>
+        </addColumn>
+    </changeSet>
+
+</databaseChangeLog>
