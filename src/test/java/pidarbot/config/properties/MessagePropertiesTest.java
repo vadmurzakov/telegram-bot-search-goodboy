@@ -4,7 +4,7 @@ import liquibase.util.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import pidarbot.service.providers.impl.MessageService;
+import pidarbot.service.business.MessageService;
 
 import static org.junit.jupiter.api.Assertions.*;
 

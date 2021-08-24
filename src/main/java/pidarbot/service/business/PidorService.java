@@ -2,42 +2,44 @@ package pidarbot.service.business;
 
 import com.pengrad.telegrambot.Callback;
 import com.pengrad.telegrambot.TelegramBot;
+import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Update;
 import com.pengrad.telegrambot.request.GetUpdates;
 import com.pengrad.telegrambot.response.GetUpdatesResponse;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import pidarbot.entity.enums.CommandBotEnum;
-import pidarbot.service.providers.impl.GoodBoyProviders;
-import pidarbot.service.providers.impl.PidorProviders;
-import pidarbot.service.providers.impl.RegistrationProviders;
-import pidarbot.service.providers.impl.StatsProviders;
+import pidarbot.service.providers.CommandProvider;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
+import static java.util.stream.Collectors.toMap;
+
+/**
+ * Ядро бота, по обработке сообщений бота и выполнения его команд
+ */
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class PidorService {
     private final TelegramBot bot;
-    private final RegistrationProviders registrationProviders;
-    private final StatsProviders statsProviders;
-    private final PidorProviders pidorProviders;
-    private final GoodBoyProviders goodBoyProviders;
-    protected int offset = 0;
+    private final Map<Enum<CommandBotEnum>, CommandProvider> commandProvidersMap;
+    protected int offset;
 
-    /* todo[vmurzakov] формирование хешмапы для Providers, пока нет времени допилить это
-    private final Map<Enum<CommandBotEnum>, CommandProviders> commandProviders;
     @Autowired
-    public PidrService(TelegramBot bot, List<CommandProviders> providers) {
+    public PidorService(TelegramBot bot, List<CommandProvider> commandProviders) {
+        this.offset = 0;
         this.bot = bot;
-        this.commandProviders = providers.stream()
-                .collect(toMap(CommandProviders::getCommand, Function.identity()));
-    }*/
+        this.commandProvidersMap = commandProviders.stream().collect(toMap(CommandProvider::getCommand, Function.identity()));
+    }
 
+    /**
+     * Джоба которая запускается по крону для получения обновлений с сервера телеграм и обработка этих сообщений.
+     */
     @Scheduled(cron = "${job.telegram.getting-update.interval}")
     synchronized public void getUpdates() {
         GetUpdates getUpdates = new GetUpdates().limit(100).offset(offset).timeout(0);
@@ -51,23 +53,9 @@ public class PidorService {
 
                     for (Update update : updates) {
                         CommandBotEnum command = CommandBotEnum.from(update.message().text());
-                        log.info("Обработка сообщения с типом {} в чате {}", command, update.message().chat().id());
-                        //todo[vmurzakov]: заменить все if-else на Providers, но нужно вынести домены в абстракцию
-                        if (command == CommandBotEnum.REG) {
-                            registrationProviders.execute(update.message());
-                        }
-                        if (command == CommandBotEnum.STATS) {
-                            statsProviders.execute(update.message());
-                        }
-                        if (command == CommandBotEnum.PIDR) {
-                            pidorProviders.execute(update.message());
-                        }
-                        if (command == CommandBotEnum.GOODBOY) {
-                            goodBoyProviders.execute(update.message());
-                        }
-                        if (command == CommandBotEnum.UNKNOWN) {
-                            log.warn("Неизвестная команда '{}', не могу её обработать", update.message().text());
-                        }
+                        Chat chat = update.message().chat();
+                        log.info("Обработка сообщения с типом {} в чате {}(id={})", command, chat.title(), chat.id());
+                        commandProvidersMap.get(command).execute(update.message());
                     }
 
                     if (!updates.isEmpty()) {

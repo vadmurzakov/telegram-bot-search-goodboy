@@ -12,7 +12,7 @@ import pidarbot.entity.domain.User;
 import pidarbot.entity.enums.CommandBotEnum;
 import pidarbot.service.business.StatsService;
 import pidarbot.service.business.UserService;
-import pidarbot.service.providers.CommandProviders;
+import pidarbot.service.providers.CommandProvider;
 
 import java.util.Comparator;
 import java.util.List;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 @Component
 @Transactional
 @RequiredArgsConstructor
-public class StatsProviders implements CommandProviders {
+public class StatsProvider implements CommandProvider {
     private final StatsService statsService;
     private final UserService userService;
     private final TelegramBot telegramBot;
@@ -34,13 +34,12 @@ public class StatsProviders implements CommandProviders {
 
     public void execute(Message message) {
         Long chatId = message.chat().id();
-        log.info("Запрос статистики в чате {}", chatId);
+        log.info("Запрос статистики в чате {}({})", message.chat().title(), message.chat().id());
         List<Stats> statsList = statsService.findStats(chatId);
 
         statsList = statsList.stream().sorted(Comparator.comparingLong(Stats::getCountPidrDay).reversed()).collect(Collectors.toList());
 
         StringBuilder msg = new StringBuilder();
-        //todo[vmurzakov]: отрефакторить дублирование кода
         msg.append("Результаты Пидор-Дня\n");
         for (int i = 0; i < statsList.size(); i++) {
             Stats stats = statsList.get(i);

@@ -9,15 +9,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import pidarbot.entity.domain.Stats;
+import pidarbot.entity.domain.User;
 import pidarbot.entity.enums.CommandBotEnum;
 import pidarbot.service.business.StatsService;
 import pidarbot.service.business.UserService;
-import pidarbot.service.providers.CommandProviders;
+import pidarbot.service.providers.CommandProvider;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RegistrationProviders implements CommandProviders {
+public class RegistrationProvider implements CommandProvider {
+    public static final String MSG_NEW_USER = "Ну шо, пидарасина, ты в игре";
+    public static final String MSG_OLD_USER = "Ты че, дурак что ли? Ты уже зареган был, долбаёбина";
     private final UserService userService;
     private final StatsService statsService;
     private final TelegramBot telegramBot;
@@ -27,36 +30,29 @@ public class RegistrationProviders implements CommandProviders {
         return CommandBotEnum.REG;
     }
 
-
     synchronized public void execute(Message message) {
         boolean isNewUser = false;
-        Integer userId = message.from().id();
-        pidarbot.entity.domain.User user = userService.findByUserTelegramId(userId);
-        if (user == null) {
-            user = userService.findByUsername(message.from().username());
-        }
+
+        User user = userService.findByUserTelegramId(message.from().id());
 
         if (user == null) {
-            //todo[vmurzakov]: заменить на MapStruct
-            user = pidarbot.entity.domain.User.builder()
-                    .userTelegramId(userId)
-                    .username(message.from().username())
-                    .firstName(message.from().firstName())
-                    .lastName(message.from().lastName())
-                    .build();
-            log.info("Сохранение нового пидарасины: {}", user);
-            userService.save(user);
-            isNewUser = true;
-        }
-
-        Long chatId = message.chat().id();
-        Stats stat = statsService.findStat(chatId, user.getId());
-        if (stat == null) {
-            registrationUserOnGame(chatId, user.getId());
+            user = saveNewUser(message.from());
+            registrationUserOnGame(message.chat().id(), user.getId());
             isNewUser = true;
         }
 
         notifySuccessSaveUser(message, isNewUser);
+    }
+
+    synchronized private User saveNewUser(com.pengrad.telegrambot.model.User user) {
+        User build = User.builder()
+                .userTelegramId(user.id())
+                .username(user.username())
+                .firstName(user.firstName())
+                .lastName(user.lastName())
+                .build();
+        log.info("Регистрация нового пользователя: {}", build);
+        return userService.save(build);
     }
 
     synchronized private void registrationUserOnGame(Long chatId, Long userId) {
@@ -65,7 +61,7 @@ public class RegistrationProviders implements CommandProviders {
     }
 
     synchronized private void notifySuccessSaveUser(Message message, boolean isNewUser) {
-        String msg = isNewUser ? "Ну шо, пидарасина, ты в игре" : "Ты че, дурак что ли? Ты уже зареган был, долбаёбина";
+        String msg = isNewUser ? MSG_NEW_USER : MSG_OLD_USER;
         SendMessage sendMessage = new SendMessage(message.chat().id(), msg)
                 .parseMode(ParseMode.HTML)
                 .disableNotification(true)

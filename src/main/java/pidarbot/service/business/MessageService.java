@@ -1,4 +1,4 @@
-package pidarbot.service.providers.impl;
+package pidarbot.service.business;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

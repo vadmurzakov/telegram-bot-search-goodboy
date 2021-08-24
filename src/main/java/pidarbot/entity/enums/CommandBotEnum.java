@@ -4,8 +4,7 @@ import liquibase.util.StringUtils;
 
 public enum CommandBotEnum {
     REG,
-    PIDR,
-    GOODBOY,
+    GAME,
     STATS,
     LEAVE,
     UNKNOWN;
