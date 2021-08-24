@@ -18,6 +18,8 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import static pidarbot.util.RandomUtil.generateRandomNumber;
+
 @Slf4j
 public abstract class AbstractGameProviders implements CommandProviders {
 
@@ -57,7 +59,7 @@ public abstract class AbstractGameProviders implements CommandProviders {
 
     /**
      * исключить из выборки тех, кто сегодня уже взял какую-то награду: пидора или красавчика
-     * @param statsList - статистика всех кто учавствует в игре
+     * @param statsList - статистика всех кто участвует в игре
      */
     protected abstract List<Stats> filterStats(List<Stats> statsList);
 
@@ -94,10 +96,6 @@ public abstract class AbstractGameProviders implements CommandProviders {
     private String getMessage(User user) {
         String format = getFormatMessageService();
         return MessageFormat.format(format, user.getFullName());
-    }
-
-    private int generateRandomNumber(int max) {
-        return 1 + (int) (Math.random() * max);
     }
 
 }

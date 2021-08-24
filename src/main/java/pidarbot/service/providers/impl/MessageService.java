@@ -4,6 +4,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pidarbot.config.properties.MessageProperties;
 
+import static pidarbot.util.RandomUtil.generateRandomNumber;
+
 @Service
 @RequiredArgsConstructor
 public class MessageService {
@@ -18,10 +20,6 @@ public class MessageService {
     public String randomGoodBoyMessage() {
         int index = generateRandomNumber(messageProperties.getGoodBoy().size() - 1);
         return messageProperties.getGoodBoy().get(index);
-    }
-
-    private int generateRandomNumber(int max) {
-        return 1 + (int) (Math.random() * max);
     }
 
 }
