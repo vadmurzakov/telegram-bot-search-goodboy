@@ -30,7 +30,7 @@ public class User {
     private String lastName;
 
     public String getFullName() {
-        String fullName = this.firstName + " " + this.lastName;
+        String fullName = this.firstName;
         if (StringUtils.isNotEmpty(this.getUsername())){
             fullName += " (@" + this.getUsername() + ")";
         }

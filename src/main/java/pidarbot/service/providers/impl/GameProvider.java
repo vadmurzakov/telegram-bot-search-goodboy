@@ -61,8 +61,8 @@ public class GameProvider implements CommandProvider {
         String msg;
 
         while (randomPidr == randomGoodBoy) {
-            randomPidr = generateRandomNumber(statsList.size() - 1);
-            randomGoodBoy = generateRandomNumber(statsList.size() - 1);
+            randomPidr = generateRandomNumber(statsList.size());
+            randomGoodBoy = generateRandomNumber(statsList.size());
         }
 
         Stats stats = statsList.get(randomPidr);

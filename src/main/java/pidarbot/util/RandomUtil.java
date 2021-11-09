@@ -5,11 +5,11 @@ package pidarbot.util;
  */
 public final class RandomUtil {
     /**
-     * Возвращает рандомное число из диапазона [1, max]
+     * Возвращает рандомное число из диапазона [0, max]
      * @param max - верхняя планка рандомного числа
-     * @return рандомное число [1, max]
+     * @return рандомное число [0, max]
      */
     public static int generateRandomNumber(int max) {
-        return 1 + (int) (Math.random() * max);
+        return (int) (Math.random() * max);
     }
 }
