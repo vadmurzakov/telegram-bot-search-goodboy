@@ -7,4 +7,4 @@ COPY target/telegram-bot-search-goodboy-*.jar /opt/app/app.jar
 
 EXPOSE $APPLICATION_PORT
 
-CMD ["java", "-jar", "/opt/app/app.jar", "--server.port=${APPLICATION_PORT}", "--telegram.token=${TOKEN}"]
+CMD ["java", "-Xmx128m", "-jar", "/opt/app/app.jar", "--server.port=${APPLICATION_PORT}", "--telegram.token=${TOKEN}"]
