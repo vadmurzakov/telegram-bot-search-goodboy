@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="19.04.2022-1" author="vmurzakov">
+        <update tableName="stats" schemaName="vm_pidar_adm">
+            <column name="count_pidr_day" value="102"/>
+            <column name="count_good_boy" value="93"/>
+            <where>user_id = '1'</where>
+        </update>
+
+        <update tableName="stats" schemaName="vm_pidar_adm">
+            <column name="count_pidr_day" value="92"/>
+            <column name="count_good_boy" value="94"/>
+            <where>user_id = '2'</where>
+        </update>
+
+        <update tableName="stats" schemaName="vm_pidar_adm">
+            <column name="count_pidr_day" value="106"/>
+            <column name="count_good_boy" value="108"/>
+            <where>user_id = '3'</where>
+        </update>
+
+        <update tableName="stats" schemaName="vm_pidar_adm">
+            <column name="count_pidr_day" value="114"/>
+            <column name="count_good_boy" value="97"/>
+            <where>user_id = '4'</where>
+        </update>
+
+        <update tableName="stats" schemaName="vm_pidar_adm">
+            <column name="count_pidr_day" value="96"/>
+            <column name="count_good_boy" value="113"/>
+            <where>user_id = '5'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>

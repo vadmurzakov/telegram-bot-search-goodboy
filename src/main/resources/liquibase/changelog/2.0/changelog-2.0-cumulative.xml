@@ -6,5 +6,6 @@
         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
 
     <include file="01-migrate-data.xml" relativeToChangelogFile="true"/>
+    <include file="02-update-table-stats.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
