@@ -2,7 +2,7 @@
 
 Для того, чтобы развернуть локально:
 ```
-docker run -d --name pdr-search -e TOKEN='токен-бота-из-телеги' -e APPLICATION_PORT=8088 -p 8088:8088 imvad/pdr-search:1.0.0
+docker run -d --name telegram-bot-search-goodboy -e TOKEN='токен-бота-из-телеги' -e APPLICATION_PORT=8088 -p 8088:8088 imvad/telegram-bot-search-goodboy:0.1.1
 ```
 
 чтобы запустить бота, необходимо добавить его в чат и зарегистрировать в игре через команду бота /reg (необходимо минимум два человека)
