@@ -9,10 +9,10 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>ru.github.vadmurzakov</groupId>
-    <artifactId>pidar-bot</artifactId>
-    <version>0.1.0</version>
-    <name>pidar-bot</name>
-    <description>Telegram bot for search Pidar-Day</description>
+    <artifactId>telegram-bot-search-goodboy</artifactId>
+    <version>0.1.1</version>
+    <name>telegram-bot-search-goodboy</name>
+    <description>Telegram bot for search GoodBoy</description>
 
     <properties>
         <java.version>11</java.version>

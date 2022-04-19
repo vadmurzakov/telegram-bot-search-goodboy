@@ -4,11 +4,11 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
 
     <changeSet id="05.11.2020-1" author="vmurzakov">
-        <createSequence sequenceName="seq_stats_id" schemaName="vm_pidar_adm" startValue="1" incrementBy="1"/>
+        <createSequence sequenceName="seq_stats_id" schemaName="goodboys" startValue="1" incrementBy="1"/>
     </changeSet>
 
     <changeSet id="05.11.2020-2" author="vmurzakov">
-        <createTable schemaName="vm_pidar_adm" tableName="stats">
+        <createTable schemaName="goodboys" tableName="stats">
             <column name="id" type="BIGINT" defaultValueSequenceNext="seq_stats_id" remarks="автоинкриментный PK">
                 <constraints primaryKey="true" nullable="false"/>
             </column>
@@ -19,7 +19,7 @@
                 <constraints nullable="false"/>
             </column>
             <column name="active" type="boolean" remarks="если true, то играет в игры"/>
-            <column name="count_pidr_day" type="BIGINT" remarks="сколько раз был Пидаром-Дня"/>
+            <column name="count_rooster" type="BIGINT" remarks="сколько раз был Пушком-Дня"/>
             <column name="count_good_boy" type="BIGINT" remarks="сколько раз был Красавчиком-Дня"/>
         </createTable>
     </changeSet>

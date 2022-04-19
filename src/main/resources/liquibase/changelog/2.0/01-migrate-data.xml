@@ -4,7 +4,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
 
     <changeSet id="03.12.2021-1" author="vmurzakov">
-        <insert tableName="user" schemaName="vm_pidar_adm">
+        <insert tableName="user" schemaName="goodboys">
             <column name="id">1</column>
             <column name="user_telegram_id">1229653897</column>
             <column name="username">DenzoHunter</column>
@@ -12,7 +12,7 @@
             <column name="last_name">Крупнов</column>
         </insert>
 
-        <insert tableName="user" schemaName="vm_pidar_adm">
+        <insert tableName="user" schemaName="goodboys">
             <column name="id">2</column>
             <column name="user_telegram_id">186736203</column>
             <column name="username">vadmurzakov</column>
@@ -20,7 +20,7 @@
             <column name="last_name">Мурзаков</column>
         </insert>
 
-        <insert tableName="user" schemaName="vm_pidar_adm">
+        <insert tableName="user" schemaName="goodboys">
             <column name="id">3</column>
             <column name="user_telegram_id">336201652</column>
             <column name="username">nson1k</column>
@@ -28,7 +28,7 @@
             <column name="last_name">Набоков</column>
         </insert>
 
-        <insert tableName="user" schemaName="vm_pidar_adm">
+        <insert tableName="user" schemaName="goodboys">
             <column name="id">4</column>
             <column name="user_telegram_id">799578607</column>
             <column name="username">alokkokokko</column>
@@ -36,7 +36,7 @@
             <column name="last_name">Вильгоненко</column>
         </insert>
 
-        <insert tableName="user" schemaName="vm_pidar_adm">
+        <insert tableName="user" schemaName="goodboys">
             <column name="id">5</column>
             <column name="user_telegram_id">1234774424</column>
             <column name="username">HateCrewmf</column>
@@ -46,65 +46,65 @@
     </changeSet>
 
     <changeSet id="03.12.2021-2" author="vmurzakov">
-        <insert tableName="stats" schemaName="vm_pidar_adm">
+        <insert tableName="stats" schemaName="goodboys">
             <column name="id">1</column>
             <column name="chat_id">-1001220381331</column>
             <column name="user_id">1</column>
             <column name="active">true</column>
-            <column name="count_pidr_day">72</column>
+            <column name="count_rooster">72</column>
             <column name="count_good_boy">65</column>
-            <column name="last_day_pidr">null</column>
+            <column name="last_day_rooster">null</column>
             <column name="last_day_good_boy">null</column>
         </insert>
 
-        <insert tableName="stats" schemaName="vm_pidar_adm">
+        <insert tableName="stats" schemaName="goodboys">
             <column name="id">2</column>
             <column name="chat_id">-1001220381331</column>
             <column name="user_id">2</column>
             <column name="active">true</column>
-            <column name="count_pidr_day">69</column>
+            <column name="count_rooster">69</column>
             <column name="count_good_boy">67</column>
-            <column name="last_day_pidr">null</column>
+            <column name="last_day_rooster">null</column>
             <column name="last_day_good_boy">null</column>
         </insert>
 
-        <insert tableName="stats" schemaName="vm_pidar_adm">
+        <insert tableName="stats" schemaName="goodboys">
             <column name="id">3</column>
             <column name="chat_id">-1001220381331</column>
             <column name="user_id">3</column>
             <column name="active">true</column>
-            <column name="count_pidr_day">75</column>
+            <column name="count_rooster">75</column>
             <column name="count_good_boy">82</column>
-            <column name="last_day_pidr">null</column>
+            <column name="last_day_rooster">null</column>
             <column name="last_day_good_boy">null</column>
         </insert>
 
-        <insert tableName="stats" schemaName="vm_pidar_adm">
+        <insert tableName="stats" schemaName="goodboys">
             <column name="id">4</column>
             <column name="chat_id">-1001220381331</column>
             <column name="user_id">4</column>
             <column name="active">true</column>
-            <column name="count_pidr_day">84</column>
+            <column name="count_rooster">84</column>
             <column name="count_good_boy">73</column>
-            <column name="last_day_pidr">null</column>
+            <column name="last_day_rooster">null</column>
             <column name="last_day_good_boy">null</column>
         </insert>
 
-        <insert tableName="stats" schemaName="vm_pidar_adm">
+        <insert tableName="stats" schemaName="goodboys">
             <column name="id">5</column>
             <column name="chat_id">-1001220381331</column>
             <column name="user_id">5</column>
             <column name="active">true</column>
-            <column name="count_pidr_day">70</column>
+            <column name="count_rooster">70</column>
             <column name="count_good_boy">77</column>
-            <column name="last_day_pidr">null</column>
+            <column name="last_day_rooster">null</column>
             <column name="last_day_good_boy">null</column>
         </insert>
     </changeSet>
 
     <changeSet id="03.12.2021-3" author="vmurzakov">
-        <alterSequence sequenceName="seq_user_id" schemaName="vm_pidar_adm" startValue="6"/>
-        <alterSequence sequenceName="seq_stats_id" schemaName="vm_pidar_adm" startValue="6"/>
+        <alterSequence sequenceName="seq_user_id" schemaName="goodboys" startValue="6"/>
+        <alterSequence sequenceName="seq_stats_id" schemaName="goodboys" startValue="6"/>
     </changeSet>
 
 </databaseChangeLog>

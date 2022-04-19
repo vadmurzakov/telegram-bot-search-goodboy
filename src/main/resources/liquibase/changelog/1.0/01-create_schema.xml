@@ -5,7 +5,7 @@
 
     <changeSet id="10.10.2020-1" author="vmurzakov">
         <sql>
-            CREATE SCHEMA IF NOT EXISTS vm_pidar_adm;
+            CREATE SCHEMA IF NOT EXISTS goodboys;
         </sql>
     </changeSet>
 
