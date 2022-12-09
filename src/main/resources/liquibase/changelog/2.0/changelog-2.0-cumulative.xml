@@ -7,5 +7,6 @@
 
     <include file="01-migrate-data.xml" relativeToChangelogFile="true"/>
     <include file="02-update-table-stats.xml" relativeToChangelogFile="true"/>
+    <include file="03-update-table-stats.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>

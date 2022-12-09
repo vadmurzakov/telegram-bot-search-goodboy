@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.0.xsd">
+
+    <changeSet id="08.12.2022-1" author="vmurzakov">
+<!--        Ден-->
+        <update tableName="stats" schemaName="goodboys">
+            <column name="count_rooster" value="135"/>
+            <column name="count_good_boy" value="136"/>
+            <where>user_id = '1'</where>
+        </update>
+
+<!--        Вад-->
+        <update tableName="stats" schemaName="goodboys">
+            <column name="count_rooster" value="140"/>
+            <column name="count_good_boy" value="134"/>
+            <where>user_id = '2'</where>
+        </update>
+
+<!--        Ник-->
+        <update tableName="stats" schemaName="goodboys">
+            <column name="count_rooster" value="150"/>
+            <column name="count_good_boy" value="148"/>
+            <where>user_id = '3'</where>
+        </update>
+
+<!--        Лех-->
+        <update tableName="stats" schemaName="goodboys">
+            <column name="count_rooster" value="164"/>
+            <column name="count_good_boy" value="144"/>
+            <where>user_id = '4'</where>
+        </update>
+
+<!--        Андр-->
+        <update tableName="stats" schemaName="goodboys">
+            <column name="count_rooster" value="142"/>
+            <column name="count_good_boy" value="164"/>
+            <where>user_id = '5'</where>
+        </update>
+    </changeSet>
+
+</databaseChangeLog>
