@@ -10,7 +10,7 @@
     </parent>
     <groupId>ru.github.vadmurzakov</groupId>
     <artifactId>telegram-bot-search-goodboy</artifactId>
-    <version>0.1.1</version>
+    <version>1.0.0</version>
     <name>telegram-bot-search-goodboy</name>
     <description>Telegram bot for search GoodBoy</description>
 
@@ -43,6 +43,10 @@
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>

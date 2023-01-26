@@ -1,12 +1,11 @@
 package bot.service.business;
 
+import static bot.util.RandomUtil.generateRandomNumber;
+
 import bot.config.properties.MessageProperties;
+import java.util.Base64;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-
-import java.util.Base64;
-
-import static bot.util.RandomUtil.generateRandomNumber;
 
 @Service
 @RequiredArgsConstructor
@@ -19,9 +18,14 @@ public class MessageService {
         return decode(messageProperties.getRooster().get(index));
     }
 
-    public String randomGoodBoyMessage() {
-        int index = generateRandomNumber(messageProperties.getGoodBoy().size() - 1);
-        return decode(messageProperties.getGoodBoy().get(index));
+    public String randomAlreadyStartedMessage() {
+        int index = generateRandomNumber(messageProperties.getAlreadyStarted().size() - 1);
+        return decode(messageProperties.getAlreadyStarted().get(index));
+    }
+
+    public String randomStatsMessage() {
+        int index = generateRandomNumber(messageProperties.getStats().size() - 1);
+        return decode(messageProperties.getStats().get(index));
     }
 
     private String decode(String encode) {

@@ -2,6 +2,7 @@ package bot.service.business;
 
 import bot.entity.domain.User;
 import bot.repository.UserRepository;
+import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,11 @@ public class UserService {
         return userRepository.findByUsername(username);
     }
 
-    public User findByUserTelegramId(Integer userId) {
+    public User findByUserTelegramId(Long userId) {
         return userRepository.findByUserTelegramId(userId);
     }
 
-    public User findByUserId(Long id) {
+    public User findByUserId(UUID id) {
         return userRepository.findUserById(id);
     }
 

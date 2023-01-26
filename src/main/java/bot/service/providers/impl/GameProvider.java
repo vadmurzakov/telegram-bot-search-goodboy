@@ -1,8 +1,12 @@
 package bot.service.providers.impl;
 
+import static bot.util.RandomUtil.generateRandomNumber;
+
+import bot.entity.domain.Journal;
 import bot.entity.domain.Stats;
 import bot.entity.domain.User;
 import bot.entity.enums.CommandBotEnum;
+import bot.service.business.JournalService;
 import bot.service.business.MessageService;
 import bot.service.business.StatsService;
 import bot.service.business.UserService;
@@ -10,17 +14,15 @@ import bot.service.providers.CommandProvider;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
-import lombok.AllArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
-
+import com.pengrad.telegrambot.response.SendResponse;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-
-import static bot.util.RandomUtil.generateRandomNumber;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 @Slf4j
 @Component
@@ -31,6 +33,7 @@ public class GameProvider implements CommandProvider {
     private UserService userService;
     private TelegramBot telegramBot;
     private MessageService messageService;
+    private JournalService journalService;
 
     @Override
     public CommandBotEnum getCommand() {
@@ -51,37 +54,23 @@ public class GameProvider implements CommandProvider {
             return;
         }
 
-        if (statsList.size() == 1) {
-            log.error("Для запуска игры, в чате {} должно быть более 1 зарегистрированного игрока", chatId);
-            return;
-        }
-
-        int randomRooster = 1;
-        int randomGoodBoy = 1;
+        int randomRooster = generateRandomNumber(statsList.size());
         String msg;
 
-        while (randomRooster == randomGoodBoy) {
-            randomRooster = generateRandomNumber(statsList.size());
-            randomGoodBoy = generateRandomNumber(statsList.size());
-        }
-
         Stats stats = statsList.get(randomRooster);
-        stats.setCountRooster(stats.getCountRooster() + 1);
-        stats.setLastDayRooster(LocalDate.now());
-        statsService.save(stats);
-
         User user = userService.findByUserId(stats.getUserId());
         msg = MessageFormat.format(messageService.randomRoosterMessage(), user.getFullName());
 
-        stats = statsList.get(randomGoodBoy);
-        stats.setCountGoodBoy(stats.getCountGoodBoy() + 1);
-        stats.setLastDayGoodBoy(LocalDate.now());
-        statsService.save(stats);
-        user = userService.findByUserId(stats.getUserId());
-        msg += "\n" + MessageFormat.format(messageService.randomGoodBoyMessage(), user.getFullName());
+        log.info("Выбор пал на {}", user.getFullName());
 
         SendMessage sendMessage = new SendMessage(chatId, msg).replyToMessageId(message.messageId());
-        telegramBot.execute(sendMessage);
+        SendResponse execute = telegramBot.execute(sendMessage);
+
+        stats.setCountRooster(stats.getCountRooster() + 1);
+        stats.setLastDayRooster(LocalDate.now());
+        stats.setLastMessageId(execute.message().messageId());
+        statsService.save(stats);
+        journalService.save(new Journal(user.getUserTelegramId()));
     }
 
     /**
@@ -97,20 +86,12 @@ public class GameProvider implements CommandProvider {
                 .filter(e -> LocalDate.now().compareTo(e.getLastDayRooster()) == 0)
                 .findFirst();
 
-        Optional<Stats> optionalStatsGoodBoy = statsList.stream()
-                .filter(e -> e.getLastDayGoodBoy() != null)
-                .filter(e -> LocalDate.now().compareTo(e.getLastDayGoodBoy()) == 0)
-                .findFirst();
+        if (optionalStatsRooster.isPresent()) {
+            String msg = messageService.randomAlreadyStartedMessage();
 
-        if (optionalStatsRooster.isPresent() && optionalStatsGoodBoy.isPresent()) {
-            User roosterToday = userService.findByUserId(optionalStatsRooster.get().getUserId());
-            User goodBoyToday = userService.findByUserId(optionalStatsGoodBoy.get().getUserId());
+            Integer replyToMessageId = optionalStatsRooster.get().getLastMessageId();
 
-            String msg = "Запускали уже сегодня\n\n" +
-                    "Пушок дня: " + roosterToday.getFullName() + "\n" +
-                    "Красаучик дня: " + goodBoyToday.getFullName();
-
-            SendMessage sendMessage = new SendMessage(message.chat().id(), msg).replyToMessageId(message.messageId());
+            SendMessage sendMessage = new SendMessage(message.chat().id(), msg).replyToMessageId(replyToMessageId);
             telegramBot.execute(sendMessage);
 
             return true;
