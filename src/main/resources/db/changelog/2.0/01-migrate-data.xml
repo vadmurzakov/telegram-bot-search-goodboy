@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="03.12.2021-1" author="vmurzakov">
+        <insert tableName="CLIENT">
+            <column name="ID">debbca1a-b6ed-4120-99a1-149114fdfdb3</column>
+            <column name="USER_TELEGRAM_ID">1229653897</column>
+            <column name="USERNAME">DenzoHunter</column>
+            <column name="FIRST_NAME">Дениз</column>
+            <column name="LAST_NAME">Крупнов</column>
+        </insert>
+        <insert tableName="STATS">
+            <column name="ID">256d3040-31c8-4436-87d3-362f30f15091</column>
+            <column name="USER_ID">debbca1a-b6ed-4120-99a1-149114fdfdb3</column>
+            <column name="CHAT_ID">-1001220381331</column>
+            <column name="ACTIVE">true</column>
+            <column name="COUNT_ROOSTER">144</column>
+            <column name="LAST_DAY_ROOSTER">null</column>
+        </insert>
+
+        <insert tableName="CLIENT">
+            <column name="ID">493666c0-1c81-49b3-a18c-a7561c428c13</column>
+            <column name="USER_TELEGRAM_ID">336201652</column>
+            <column name="USERNAME">nson1k</column>
+            <column name="FIRST_NAME">Никита</column>
+            <column name="LAST_NAME">Набоков</column>
+        </insert>
+        <insert tableName="STATS">
+            <column name="ID">cc0ac2e6-71e2-4052-b4a4-728ecfc1a168</column>
+            <column name="USER_ID">493666c0-1c81-49b3-a18c-a7561c428c13</column>
+            <column name="CHAT_ID">-1001220381331</column>
+            <column name="ACTIVE">true</column>
+            <column name="COUNT_ROOSTER">159</column>
+            <column name="LAST_DAY_ROOSTER">null</column>
+        </insert>
+
+        <insert tableName="CLIENT">
+            <column name="ID">10e974cd-fc3f-4b99-a11d-00381957c76b</column>
+            <column name="USER_TELEGRAM_ID">799578607</column>
+            <column name="USERNAME">alokkokokko</column>
+            <column name="FIRST_NAME">Алексей</column>
+            <column name="LAST_NAME">Вильгоненко</column>
+        </insert>
+        <insert tableName="STATS">
+            <column name="ID">4b560264-ffe0-49ff-9fd5-fa8ff64ff5fb</column>
+            <column name="USER_ID">10e974cd-fc3f-4b99-a11d-00381957c76b</column>
+            <column name="CHAT_ID">-1001220381331</column>
+            <column name="ACTIVE">true</column>
+            <column name="COUNT_ROOSTER">178</column>
+            <column name="LAST_DAY_ROOSTER">null</column>
+        </insert>
+
+        <insert tableName="CLIENT">
+            <column name="ID">bdd1a868-09c5-46d1-940e-42953e288adc</column>
+            <column name="USER_TELEGRAM_ID">1234774424</column>
+            <column name="USERNAME">HateCrewmf</column>
+            <column name="FIRST_NAME">Андрей</column>
+            <column name="LAST_NAME">Мажаров</column>
+        </insert>
+        <insert tableName="STATS">
+            <column name="ID">683a810e-62a9-49c9-b3a4-1385fc3edb3d</column>
+            <column name="USER_ID">bdd1a868-09c5-46d1-940e-42953e288adc</column>
+            <column name="CHAT_ID">-1001220381331</column>
+            <column name="ACTIVE">true</column>
+            <column name="COUNT_ROOSTER">152</column>
+            <column name="LAST_DAY_ROOSTER">null</column>
+        </insert>
+
+        <insert tableName="CLIENT">
+            <column name="ID">c19cfb38-ed0f-47af-8248-03f2d232fd6e</column>
+            <column name="USER_TELEGRAM_ID">582193931</column>
+            <column name="USERNAME">vallenhast</column>
+            <column name="FIRST_NAME">ＭΛO</column>
+        </insert>
+        <insert tableName="STATS">
+            <column name="ID">7d6e3fe1-72c5-4eba-8ba1-35169480ada5</column>
+            <column name="USER_ID">c19cfb38-ed0f-47af-8248-03f2d232fd6e</column>
+            <column name="CHAT_ID">-1001220381331</column>
+            <column name="ACTIVE">true</column>
+            <column name="COUNT_ROOSTER">1</column>
+            <column name="LAST_DAY_ROOSTER">null</column>
+        </insert>
+    </changeSet>
+
+</databaseChangeLog>

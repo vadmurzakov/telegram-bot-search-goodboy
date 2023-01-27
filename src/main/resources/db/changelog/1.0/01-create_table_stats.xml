@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="05.11.2020-2" author="vmurzakov">
+        <createTable tableName="STATS">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_stats"/>
+            </column>
+            <column name="CHAT_ID" type="BIGINT" remarks="id чата в telegram">
+                <constraints nullable="false"/>
+            </column>
+            <column name="USER_ID" type="UUID" remarks="id пользователя">
+                <constraints nullable="false"/>
+            </column>
+            <column name="ACTIVE" type="boolean" remarks="если true, то играет в игры"/>
+            <column name="COUNT_ROOSTER" type="BIGINT" remarks="сколько раз был Пушком-Дня"/>
+            <column name="LAST_MESSAGE_ID" type="INTEGER" remarks="id последнего сообщения с пушком"/>
+            <column name="LAST_DAY_ROOSTER" type="DATE" remarks="Дата когда последний раз был пушком"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

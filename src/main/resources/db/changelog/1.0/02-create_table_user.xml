@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+    
+    <changeSet id="10.10.2020-2" author="vmurzakov">
+        <createTable tableName="CLIENT">
+            <column name="ID" type="UUID">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_user"/>
+            </column>
+            <column name="USER_TELEGRAM_ID" type="BIGINT" remarks="id пользователя в telegram">
+                <constraints nullable="false" unique="true"/>
+            </column>
+            <column name="USERNAME" type="VARCHAR(255)" remarks="никнейм пользователя в telegram"/>
+            <column name="FIRST_NAME" type="VARCHAR(255)" remarks="имя пользователя в telegram"/>
+            <column name="LAST_NAME" type="VARCHAR(255)" remarks="фамилия пользователя в telegram"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>
