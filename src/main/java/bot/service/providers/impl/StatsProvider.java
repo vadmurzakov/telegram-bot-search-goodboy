@@ -1,7 +1,7 @@
 package bot.service.providers.impl;
 
+import bot.entity.domain.Client;
 import bot.entity.domain.Stats;
-import bot.entity.domain.User;
 import bot.entity.enums.CommandBotEnum;
 import bot.service.business.MessageService;
 import bot.service.business.StatsService;
@@ -47,15 +47,15 @@ public class StatsProvider implements CommandProvider {
         StringBuilder msg = new StringBuilder();
         if (ARCHI_PIDOR.equals(footer)) {
             Stats stats = statsList.get(0);
-            User user = userService.findByUserId(stats.getUserId());
-            msg.append(MessageFormat.format(footer, user.getFullName()));
+            Client user = userService.findByUserId(stats.getUserId());
+            msg.append(MessageFormat.format(footer, user.toString()));
         } else {
             msg.append(footer);
             msg.append("\n");
             for (int i = 0; i < statsList.size(); i++) {
                 Stats stats = statsList.get(i);
-                User user = userService.findByUserId(stats.getUserId());
-                msg.append(i + 1).append(") ").append(user.getFullName()).append(" ");
+                Client user = userService.findByUserId(stats.getUserId());
+                msg.append(i + 1).append(") ").append(user.toString()).append(" ");
                 msg.append(stats.getCountRooster()).append(" раз(а)\n");
             }
         }

@@ -2,9 +2,9 @@ package bot.service.providers.impl;
 
 import static bot.util.RandomUtil.generateRandomNumber;
 
+import bot.entity.domain.Client;
 import bot.entity.domain.Journal;
 import bot.entity.domain.Stats;
-import bot.entity.domain.User;
 import bot.entity.enums.CommandBotEnum;
 import bot.service.business.JournalService;
 import bot.service.business.MessageService;
@@ -58,10 +58,10 @@ public class GameProvider implements CommandProvider {
         String msg;
 
         Stats stats = statsList.get(randomRooster);
-        User user = userService.findByUserId(stats.getUserId());
-        msg = MessageFormat.format(messageService.randomRoosterMessage(), user.getFullName());
+        Client user = userService.findByUserId(stats.getUserId());
+        msg = MessageFormat.format(messageService.randomRoosterMessage(), user.toString());
 
-        log.info("Выбор пал на {}", user.getFullName());
+        log.info("Выбор пал на {}", user.toString());
 
         SendMessage sendMessage = new SendMessage(chatId, msg).replyToMessageId(message.messageId());
         SendResponse execute = telegramBot.execute(sendMessage);

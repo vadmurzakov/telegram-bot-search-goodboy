@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk11:jre-11.0.11_9-alpine
+FROM openjdk:17-alpine3.14
 
 ENV APPLICATION_PORT=8040
 ENV TOKEN=TOKEN

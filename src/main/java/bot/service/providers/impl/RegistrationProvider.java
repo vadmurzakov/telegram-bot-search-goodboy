@@ -1,7 +1,7 @@
 package bot.service.providers.impl;
 
+import bot.entity.domain.Client;
 import bot.entity.domain.Stats;
-import bot.entity.domain.User;
 import bot.entity.enums.CommandBotEnum;
 import bot.service.business.StatsService;
 import bot.service.business.UserService;
@@ -37,21 +37,21 @@ public class RegistrationProvider implements CommandProvider {
         boolean isNewUser = false;
 
         //todo[vmurzakov]: тут надо искать не только по ид-пользователя, но и в разрезе ид-чата
-        User user = userService.findByUserTelegramId(Long.valueOf(message.from().id()));
+        Client user = userService.findByUserTelegramId(Long.valueOf(message.from().id()));
 
         if (user == null) {
             user = saveNewUser(message.from());
             registrationUserOnGame(message.chat().id(), user.getId());
             isNewUser = true;
         } else {
-            log.info("Пользователь {} уже зарегестрирован в чате {}", user.getFullName(), message.chat().id());
+            log.info("Пользователь {} уже зарегестрирован в чате {}", user.toString(), message.chat().id());
         }
 
         notifySuccessSaveUser(message, isNewUser);
     }
 
-    synchronized private User saveNewUser(com.pengrad.telegrambot.model.User user) {
-        User build = User.builder()
+    synchronized private Client saveNewUser(com.pengrad.telegrambot.model.User user) {
+        Client build = Client.builder()
                 .userTelegramId(Long.valueOf(user.id()))
                 .username(user.username())
                 .firstName(user.firstName())

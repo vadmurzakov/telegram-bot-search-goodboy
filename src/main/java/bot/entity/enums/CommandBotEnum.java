@@ -1,6 +1,6 @@
 package bot.entity.enums;
 
-import liquibase.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public enum CommandBotEnum {
     REG,

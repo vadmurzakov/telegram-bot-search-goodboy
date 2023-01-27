@@ -4,7 +4,7 @@ target/
 !**/src/main/**/target/
 !**/src/test/**/target/
 src/main/resources/config
-db/
+h2/
 derby.log
 
 ### STS ###

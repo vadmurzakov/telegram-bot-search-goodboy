@@ -1,6 +1,6 @@
 package bot.service.business;
 
-import bot.entity.domain.User;
+import bot.entity.domain.Client;
 import bot.repository.UserRepository;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
@@ -16,19 +16,19 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public User findByUsername(String username) {
+    public Client findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    public User findByUserTelegramId(Long userId) {
+    public Client findByUserTelegramId(Long userId) {
         return userRepository.findByUserTelegramId(userId);
     }
 
-    public User findByUserId(UUID id) {
+    public Client findByUserId(UUID id) {
         return userRepository.findUserById(id);
     }
 
-    public User save(User user) {
+    public Client save(Client user) {
         return userRepository.save(user);
     }
 }

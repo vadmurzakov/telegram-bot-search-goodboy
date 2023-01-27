@@ -28,7 +28,7 @@ public class BotService {
     private final TelegramBot bot;
     private final Map<Enum<CommandBotEnum>, CommandProvider> commandProvidersMap;
     protected int offset;
-    private boolean lock;
+    private volatile boolean lock;
 
     @Autowired
     public BotService(TelegramBot bot, List<CommandProvider> commandProviders) {

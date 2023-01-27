@@ -2,17 +2,14 @@ package bot;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ActiveProfiles;
 
 @SpringBootTest
-class BootstrapApplicationTest {
+@ActiveProfiles("test")
+public class BootstrapApplicationTest {
 
     @Test
-    public void contextLoads() {
-    }
-
-    @Test
-    public void main() {
-        BootstrapApplication.main(new String[0]);
+    void contextLoads() {
     }
 
 }

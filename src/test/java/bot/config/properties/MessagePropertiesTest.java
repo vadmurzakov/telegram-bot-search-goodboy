@@ -4,14 +4,13 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import bot.BootstrapApplicationTest;
 import bot.service.business.MessageService;
-import liquibase.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
-public class MessagePropertiesTest {
+public class MessagePropertiesTest extends BootstrapApplicationTest {
 
     @Autowired
     private MessageProperties properties;
