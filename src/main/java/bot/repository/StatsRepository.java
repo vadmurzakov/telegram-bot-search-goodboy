@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface StatsRepository extends JpaRepository<Stats, UUID> {
-    Stats findByChatIdAndUserId(Long chatId, Long userId);
+    Stats findByChatIdAndUserId(Long chatId, UUID userId);
     List<Stats> findAllByChatIdAndActive(Long chatId, boolean active);
 }

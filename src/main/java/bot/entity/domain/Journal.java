@@ -13,11 +13,13 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
 public class Journal extends AbstractPersistable<UUID> {
-    private Long userTelegramId;
+    private UUID userId;
+    private Long chatId;
     private LocalDate createDate;
 
-    public Journal(Long userTelegramId) {
-        this.userTelegramId = userTelegramId;
+    public Journal(UUID userId, Long chatId) {
+        this.userId = userId;
+        this.chatId = chatId;
         this.createDate = LocalDate.now();
     }
 }

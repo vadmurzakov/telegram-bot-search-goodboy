@@ -1,8 +1,8 @@
 package bot.service.providers.impl;
 
-import bot.entity.domain.Client;
 import bot.entity.domain.Stats;
 import bot.entity.enums.CommandBotEnum;
+import bot.entity.enums.MessageTemplateEnum;
 import bot.service.business.MessageService;
 import bot.service.business.StatsService;
 import bot.service.business.UserService;
@@ -12,8 +12,6 @@ import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.text.MessageFormat;
 import java.util.Comparator;
-import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -36,31 +34,38 @@ public class StatsProvider implements CommandProvider {
         return CommandBotEnum.STATS;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param message объект Message в рамках которого пришла команда на исполнение
+     *                содержит в себе всю метаинформацию необходимую для выполнения команды
+     */
     public void execute(Message message) {
-        Long chatId = message.chat().id();
-        log.info("Запрос статистики в чате {}(idChat={})", message.chat().title(), message.chat().id());
-        List<Stats> statsList = statsService.findStats(chatId);
-        String footer = messageService.randomStatsMessage();
+        final var chatId = message.chat().id();
+        final var footer = messageService.randomMessage(MessageTemplateEnum.STATS);
 
-        statsList = statsList.stream().sorted(Comparator.comparingLong(Stats::getCountRooster).reversed()).collect(Collectors.toList());
+        log.info("Запрос статистики в чате '{}'(idChat={})", message.chat().title(), message.chat().id());
 
-        StringBuilder msg = new StringBuilder();
+        var statsList = statsService.findStats(chatId).stream()
+            .sorted(Comparator.comparingLong(Stats::getCountRooster).reversed())
+            .toList();
+
+        var msg = new StringBuilder();
         if (ARCHI_PIDOR.equals(footer)) {
-            Stats stats = statsList.get(0);
-            Client user = userService.findByUserId(stats.getUserId());
+            var stats = statsList.get(0);
+            var user = userService.findById(stats.getUserId());
             msg.append(MessageFormat.format(footer, user.toString()));
         } else {
-            msg.append(footer);
-            msg.append("\n");
+            msg.append(footer).append("\n");
             for (int i = 0; i < statsList.size(); i++) {
-                Stats stats = statsList.get(i);
-                Client user = userService.findByUserId(stats.getUserId());
+                var stats = statsList.get(i);
+                var user = userService.findById(stats.getUserId());
                 msg.append(i + 1).append(") ").append(user.toString()).append(" ");
                 msg.append(stats.getCountRooster()).append(" раз(а)\n");
             }
         }
 
-        SendMessage sendMessage = new SendMessage(chatId, msg.toString()).replyToMessageId(message.messageId());
+        final var sendMessage = new SendMessage(chatId, msg.toString()).replyToMessageId(message.messageId());
         telegramBot.execute(sendMessage);
     }
 }

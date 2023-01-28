@@ -1,7 +1,8 @@
 package bot.service.business;
 
-import bot.entity.domain.Client;
+import bot.entity.domain.User;
 import bot.repository.UserRepository;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,19 +17,19 @@ public class UserService {
 
     private final UserRepository userRepository;
 
-    public Client findByUsername(String username) {
+    public User findByUsername(String username) {
         return userRepository.findByUsername(username);
     }
 
-    public Client findByUserTelegramId(Long userId) {
-        return userRepository.findByUserTelegramId(userId);
+    public Optional<User> findByUserTelegramId(Long userTelegramId) {
+        return Optional.ofNullable(userRepository.findByUserTelegramId(userTelegramId));
     }
 
-    public Client findByUserId(UUID id) {
+    public User findById(UUID id) {
         return userRepository.findUserById(id);
     }
 
-    public Client save(Client user) {
+    public User save(User user) {
         return userRepository.save(user);
     }
 }

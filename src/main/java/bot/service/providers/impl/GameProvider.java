@@ -2,10 +2,10 @@ package bot.service.providers.impl;
 
 import static bot.util.RandomUtil.generateRandomNumber;
 
-import bot.entity.domain.Client;
 import bot.entity.domain.Journal;
 import bot.entity.domain.Stats;
 import bot.entity.enums.CommandBotEnum;
+import bot.entity.enums.MessageTemplateEnum;
 import bot.service.business.JournalService;
 import bot.service.business.MessageService;
 import bot.service.business.StatsService;
@@ -14,7 +14,6 @@ import bot.service.providers.CommandProvider;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
-import com.pengrad.telegrambot.response.SendResponse;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.util.List;
@@ -40,64 +39,65 @@ public class GameProvider implements CommandProvider {
         return CommandBotEnum.GAME;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param message объект Message в рамках которого пришла команда на исполнение
+     *                содержит в себе всю метаинформацию необходимую для выполнения команды
+     */
+    @Override
     public void execute(Message message) {
-        Long chatId = message.chat().id();
-        List<Stats> statsList = statsService.findStats(chatId);
+        final var chatId = message.chat().id();
+        final var messageId = message.messageId();
+        final var chatTitle = message.chat().title();
 
-        if (isGameStartedToday(message, statsList)) {
-            log.warn("Для чата {}({}) игра уже запускалась", message.chat().title(), message.chat().id());
-            return;
-        }
-
+        var statsList = statsService.findStats(chatId);
         if (CollectionUtils.isEmpty(statsList)) {
-            log.warn("В чате {} не зарегистрировано ни одного игрока", chatId);
+            log.info("В чате {}({}) не зарегистрировано ни одного игрока", chatTitle, chatId);
+            final var msg = messageService.randomMessage(MessageTemplateEnum.NO_ACTIVE_PLAYERS);
+            final var request = new SendMessage(chatId, msg).replyToMessageId(messageId);
+            telegramBot.execute(request);
             return;
         }
 
-        int randomRooster = generateRandomNumber(statsList.size());
-        String msg;
+        Optional<Stats> gameStartedToday = isGameStartedToday(statsList);
+        if (gameStartedToday.isPresent()) {
+            log.info("Для чата {}({}) игра уже запускалась", chatTitle, chatId);
+            final var user = userService.findById(gameStartedToday.get().getUserId());
+            final var msg = MessageFormat.format(messageService.randomMessage(MessageTemplateEnum.ALREADY_STARTED), user.toString());
 
-        Stats stats = statsList.get(randomRooster);
-        Client user = userService.findByUserId(stats.getUserId());
-        msg = MessageFormat.format(messageService.randomRoosterMessage(), user.toString());
+            final var sendMessage = new SendMessage(message.chat().id(), msg).replyToMessageId(message.messageId());
+            telegramBot.execute(sendMessage);
+        } else {
+            int randomRooster = generateRandomNumber(statsList.size());
 
-        log.info("Выбор пал на {}", user.toString());
+            var stats = statsList.get(randomRooster);
+            final var user = userService.findById(stats.getUserId());
+            final var msg = MessageFormat.format(messageService.randomMessage(MessageTemplateEnum.ROOSTER), user.toString());
 
-        SendMessage sendMessage = new SendMessage(chatId, msg).replyToMessageId(message.messageId());
-        SendResponse execute = telegramBot.execute(sendMessage);
+            final var request = new SendMessage(chatId, msg).replyToMessageId(messageId);
+            final var execute = telegramBot.execute(request);
 
-        stats.setCountRooster(stats.getCountRooster() + 1);
-        stats.setLastDayRooster(LocalDate.now());
-        stats.setLastMessageId(execute.message().messageId());
-        statsService.save(stats);
-        journalService.save(new Journal(user.getUserTelegramId()));
+            stats.setCountRooster(stats.getCountRooster() + 1);
+            stats.setLastDayRooster(LocalDate.now());
+            stats.setLastMessageId(execute.message().messageId());
+            statsService.save(stats);
+            journalService.save(new Journal(user.getId(), chatId));
+            log.info("Запущена игра в чате '{}'({}): '{}'", chatTitle, chatId, msg);
+        }
     }
 
     /**
-     * Проверить запускался ли бот сегодня, чтобы не искать данные повторно
-     * и отправить соответствующее уведомление в чат, если это необходимо
+     * Проверить запускалась ли игра сегодня.
      *
      * @param statsList - список игроков в чате
-     * @return false - если игра уже запускалась и данные найдены
+     * @return true - если игра сегодня запускалась, false - если игра сегодня не запускалась
      */
-    protected boolean isGameStartedToday(Message message, List<Stats> statsList) {
-        Optional<Stats> optionalStatsRooster = statsList.stream()
-                .filter(e -> e.getLastDayRooster() != null)
-                .filter(e -> LocalDate.now().compareTo(e.getLastDayRooster()) == 0)
-                .findFirst();
-
-        if (optionalStatsRooster.isPresent()) {
-            String msg = messageService.randomAlreadyStartedMessage();
-
-            Integer replyToMessageId = optionalStatsRooster.get().getLastMessageId();
-
-            SendMessage sendMessage = new SendMessage(message.chat().id(), msg).replyToMessageId(replyToMessageId);
-            telegramBot.execute(sendMessage);
-
-            return true;
-        }
-
-        return false;
+    protected Optional<Stats> isGameStartedToday(List<Stats> statsList) {
+        return statsList.stream()
+            .filter(e -> e.getLastDayRooster() != null)
+            .filter(e -> LocalDate.now().isEqual(e.getLastDayRooster()))
+            .findFirst();
     }
 
 }

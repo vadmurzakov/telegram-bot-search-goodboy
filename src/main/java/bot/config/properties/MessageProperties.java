@@ -1,15 +1,15 @@
 package bot.config.properties;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 @Data
 @Component
-@ConfigurationProperties(prefix = "messages")
+@ConfigurationProperties
 public class MessageProperties {
-    private List<String> rooster;
-    private List<String> alreadyStarted;
-    private List<String> stats;
+    private final Map<String, List<String>> messages = new HashMap<>();
 }

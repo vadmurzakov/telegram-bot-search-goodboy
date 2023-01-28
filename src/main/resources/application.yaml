@@ -7,14 +7,17 @@ spring:
     generate-ddl: false
     hibernate:
       ddl-auto: validate
+    properties:
+      hibernate:
+        default_schema: public
     database-platform: org.hibernate.dialect.PostgreSQLDialect
   liquibase:
     enabled: true
     url: ${spring.datasource.url}
     user: ${spring.datasource.username}
     password: ${spring.datasource.password}
+    default-schema: ${spring.jpa.properties.hibernate.default_schema}
     change-log: classpath:db/changelog/db.changelog-master.xml
-    default-schema: public
   datasource:
     url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:8041}/${DATABASE_NAME:goodboys}
     username: ${DATABASE_USERNAME:postgres}
@@ -22,10 +25,11 @@ spring:
     driver-class-name: org.postgresql.Driver
     hikari:
       auto-commit: false
-job:
-  telegram:
-    getting-update:
-      interval: "*/2 * * * * *"
+
+logging:
+  level:
+    bot: ${LOGGING_LEVEL_APP:debug}
+    org.springframework: ${LOGGING_LEVEL_SPRING:info}
 
 telegram:
   token: ${TOKEN}
@@ -54,9 +58,9 @@ messages:
     - ezB9INCz0L7RgtC+0LLRjCDQutC+0L/RgtC40LvRjNC90YMsINCx0YPQtNC10Lwg0LPQvtGC0L7QstC40YLRjCDQsiDQvdC10Lkg0YHQstC+0Lgg0YHQvtGB0LjRgdC+0L3Riy4gbG9ocGlkb3I=
     - ezB9INC30LDQtNC+0Log0YLQviDRgyDRgtC10LHRjyDRgdC10LPQvtC00L3RjyDQv9C+0YHQu9Cw0LHQtdC1INC+0YHRgtCw0LvRjNC90YvRhQ==
     - ezB9INCw0YUg0YLRiyDQttC+0LLQsNC90L3QsNGPINC20L7Qv9Cw
-  already-started:
-    - 0J3RgyDRkdCx0LDQvdGL0Lkg0YLRiyDQutCw0LfQuNC90LDQuiDRgdGD0LrQsCwg0LfQsNC/0YPRgdC60LDQu9C4INGD0LbQtSwg0L3Rgy4uLg==
-    - 0J/QvtCx0LDRiNC60LUg0YHQtdCx0LUg0L/QvtGC0YvQutCw0Lkg0YHQv9C10YDQvNC+0LHQsNC6LCDQuCDQs9C70LDQt9CwINC/0YDQvtGC0YDQuCwg0L/QuNC00L7RgCDRg9C20LUg0LLRi9GP0LLQu9C10L0=
+  already_started:
+    - 0J3RgyDRkdCx0LDQvdGL0Lkg0YLRiyDQutCw0LfQuNC90LDQuiDRgdGD0LrQsCwg0LfQsNC/0YPRgdC60LDQu9C4INGD0LbQtSwg0L3Rgy4uLiDQodC10LPQvtC00L3RjyDQtNGL0YDRj9Cy0YvQuSB7MH0=
+    - 0J/QvtCx0LDRiNC60LUg0YHQtdCx0LUg0L/QvtGC0YvQutCw0Lkg0YHQv9C10YDQvNC+0LHQsNC6LCDQuCDQs9C70LDQt9CwINC/0YDQvtGC0YDQuCwg0L/QuNC00L7RgCB7MH0g0YPQttC1INCy0YvRj9Cy0LvQtdC9
   stats:
     - 0JTQtdCy0LDRh9C60LgsINC/0YDQuNCz0L7RgtC+0LLRjNGC0LUg0YHQstC+0Lgg0LPRgNGP0LfQvdGL0LUg0YHRgNCw0LvRjNC90LjQutC4INC6INGA0LDQt9Cx0L7RgNGDINC/0L7Qu9C10YLQvtCyOg==
     - 0JfQsNCz0L7QvdGP0LXQvCDQstGB0LXRhSDQv9C40LTQsNGA0L7QsiDQsiDQstC+0LvRjNC10YA6
@@ -69,3 +73,14 @@ messages:
     - 0J/QvtC/0L/QtdC90LPQsNCz0LXQvSDQvtGC0LrRgNGL0YIg0YMg0YHQu9C10LTRg9GO0YnQuNGFINC/0YPQv9GB0LjQutC+0LI6
     - 0JvRg9C/0Y/RgtGB0Y8g0LIg0YLRg9C30LAsINC90L4g0L3QtSDQuNCz0YDQsNGO0YIg0LIg0LrQsNGA0YLRizo=
     - 0KLQtdGA0L/QuCDQv2nQtNGA0Y7Quiwg0L9p0LTQsNGA0LDRgdC+0Lwg0YHRgtCw0L3QtdGIOg==
+  no_active_players:
+    - 0J/Rg9C6INGB0YDQtdC90YzQui4uLiDQkCDRgyDQstCw0YEg0YLRg9GCINC90LXRgiDQsNC60YLQuNCy0L3Ri9GFINC40LPRgNC+0LrQvtCyLiDQn9GA0L7RgtGL0LrQsNC50YLQtSAvcmVnINCwINC/0L7RgtC+0Lwg0L/QvtCz0L7QstC+0YDQuNC8Lg==
+  registration:
+    - CAACAgIAAxkBAAEHfQxj1UsbUi3saisrTmv6LdzKnbvIpgACxw0AAoLZUUqPZ3pCY5lGPC0E
+    - CAACAgIAAxkBAAEHcyNj0jQ0oF0zeAyjL-bpil_2t8yckgACDxEAAojF0Usu_WLHr8Vjzi0E
+    - CAACAgIAAxkBAAEHfQ5j1Ut46om2fn__bpmMtjhTrZKxzgACzBQAAgrXyUsa7GgoHs1N_y0E
+    - CAACAgIAAxkBAAEHfRBj1UuTLxYbh7UEUHAz2w8M05-uBwACkhAAAqtKyUuSgBNYR-8rQC0E
+    - CAACAgIAAxkBAAEHfRJj1UuioXwrr_fo4egB6kQ1x7IB1gACChAAAuYj0UgrWuoknRbbxi0E
+    - CAACAgIAAxkBAAEHfSlj1U5nmjdVAAHV5xX3x9ocfGc9Fo4AAkwBAAJLXiELexcuHq07_kotBA
+  user_already_playing:
+    - 0KLRiyDRh9C1LCDQtNGD0YDQsNC6INGH0YLQviDQu9C4PyDQotGLINGD0LbQtSDQt9Cw0YDQtdCz0LDQvSDQsdGL0LssINC00L7Qu9Cx0LDRkdCx0LjQvdCw

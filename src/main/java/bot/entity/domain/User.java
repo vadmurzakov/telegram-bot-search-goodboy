@@ -17,7 +17,7 @@ import org.springframework.data.jpa.domain.AbstractPersistable;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = true)
-public class Client extends AbstractPersistable<UUID> {
+public class User extends AbstractPersistable<UUID> {
     private Long userTelegramId;
     private String username;
     private String firstName;

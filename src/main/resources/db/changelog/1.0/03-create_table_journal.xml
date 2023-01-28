@@ -7,13 +7,16 @@
 
     <changeSet id="26.01.2022-1" author="vmurzakov">
         <createTable tableName="journal">
-            <column name="ID" type="UUID">
-                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_journal"/>
+            <column name="id" type="UUID">
+                <constraints nullable="false" unique="true" primaryKey="true" primaryKeyName="pk_journal"/>
             </column>
-            <column name="USER_TELEGRAM_ID" type="BIGINT" remarks="id пользователя в telegram">
-                <constraints nullable="false" unique="true"/>
+            <column name="user_id" type="UUID" remarks="id пользователя">
+                <constraints nullable="false"/>
             </column>
-            <column name="CREATE_DATE" type="DATE" remarks="Дата когда был пушком"/>
+            <column name="chat_id" type="BIGINT" remarks="id чата">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_date" type="DATE" remarks="Дата когда был пушком"/>
         </createTable>
     </changeSet>
 
