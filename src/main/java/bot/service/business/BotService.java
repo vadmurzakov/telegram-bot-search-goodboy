@@ -6,7 +6,6 @@ import bot.entity.enums.CommandBotEnum;
 import bot.service.providers.CommandProvider;
 import com.pengrad.telegrambot.TelegramBot;
 import com.pengrad.telegrambot.UpdatesListener;
-import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Update;
 import jakarta.annotation.PostConstruct;
 import java.util.List;
@@ -28,7 +27,8 @@ public class BotService {
     @Autowired
     public BotService(TelegramBot bot, List<CommandProvider> commandProviders) {
         this.bot = bot;
-        this.commandProvidersMap = commandProviders.stream().collect(toMap(CommandProvider::getCommand, Function.identity()));
+        this.commandProvidersMap =
+            commandProviders.stream().collect(toMap(CommandProvider::getCommand, Function.identity()));
     }
 
     /**
@@ -37,13 +37,19 @@ public class BotService {
     @PostConstruct
     public void listener() {
         bot.setUpdatesListener(updates -> {
-            for (Update update : updates) {
-                CommandBotEnum command = CommandBotEnum.from(update.message().text());
-                Chat chat = update.message().chat();
-                log.debug("Обработка сообщения с типом {} в чате '{}'(id={})", command, chat.title(), chat.id());
-                commandProvidersMap.get(command).execute(update.message());
+            try {
+                for (Update update : updates) {
+                    if (update.message() != null) {
+                        CommandBotEnum command = CommandBotEnum.from(update.message().text());
+                        commandProvidersMap.get(command).execute(update.message());
+                    }
+                }
+                return UpdatesListener.CONFIRMED_UPDATES_ALL;
+            } catch (Exception e) {
+                log.error("Неизвестная ошибка: ", e);
+                return UpdatesListener.CONFIRMED_UPDATES_ALL;
             }
-            return UpdatesListener.CONFIRMED_UPDATES_ALL;
+        }, e -> {
         });
     }
 }
