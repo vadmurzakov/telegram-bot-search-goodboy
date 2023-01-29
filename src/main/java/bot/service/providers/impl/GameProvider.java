@@ -73,7 +73,12 @@ public class GameProvider implements CommandProvider {
 
             var stats = statsList.get(randomRooster);
             final var user = userService.findById(stats.getUserId());
-            final var msg = MessageFormat.format(messageService.randomMessage(MessageTemplateEnum.ROOSTER), user.toString());
+            final String msg;
+            if (user.getUserTelegramId().equals(message.from().id())) {
+                msg = MessageFormat.format(messageService.randomMessage(MessageTemplateEnum.ROOSTER_WHO_CALLED), user.toString());
+            } else {
+                msg = MessageFormat.format(messageService.randomMessage(MessageTemplateEnum.ROOSTER), user.toString());
+            }
 
             final var request = new SendMessage(chatId, msg).replyToMessageId(messageId);
             final var execute = telegramBot.execute(request);

@@ -7,5 +7,6 @@ public enum MessageTemplateEnum {
     NO_ACTIVE_PLAYERS,
     REGISTRATION,
     USER_ALREADY_PLAYING,
+    ROOSTER_WHO_CALLED,
     ;
 }
