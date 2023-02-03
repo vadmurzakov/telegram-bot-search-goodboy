@@ -53,21 +53,20 @@ public class GameProvider implements CommandProvider {
 
         var statsList = statsService.findStats(chatId);
         if (CollectionUtils.isEmpty(statsList)) {
-            log.info("В чате {}({}) не зарегистрировано ни одного игрока", chatTitle, chatId);
+            log.info("В чате '{}'({}) не зарегистрировано ни одного игрока", chatTitle, chatId);
             final var msg = messageService.randomMessage(MessageTemplateEnum.NO_ACTIVE_PLAYERS);
             final var request = new SendMessage(chatId, msg).replyToMessageId(messageId);
             telegramBot.execute(request);
             return;
         }
 
-        Optional<Stats> gameStartedToday = isGameStartedToday(statsList);
+        final var gameStartedToday = isGameStartedToday(statsList);
         if (gameStartedToday.isPresent()) {
-            log.info("Для чата {}({}) игра уже запускалась", chatTitle, chatId);
+            log.info("Для чата '{}'({}) игра уже запускалась", chatTitle, chatId);
             final var user = userService.findById(gameStartedToday.get().getUserId());
             final var msg = MessageFormat.format(messageService.randomMessage(MessageTemplateEnum.ALREADY_STARTED), user.toString());
-
-            final var sendMessage = new SendMessage(message.chat().id(), msg).replyToMessageId(message.messageId());
-            telegramBot.execute(sendMessage);
+            final var request = new SendMessage(chatId, msg).replyToMessageId(messageId);
+            telegramBot.execute(request);
         } else {
             int randomRooster = generateRandomNumber(statsList.size());
 
