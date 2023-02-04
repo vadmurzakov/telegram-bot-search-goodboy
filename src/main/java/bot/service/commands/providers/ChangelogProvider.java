@@ -1,11 +1,15 @@
 package bot.service.commands.providers;
 
+import static bot.entity.enums.CommandBotEnum.CHANGELOG;
+
 import bot.entity.enums.CommandBotEnum;
 import bot.service.business.ChatService;
 import bot.service.commands.AbstractProvider;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
+import com.pengrad.telegrambot.request.SendPhoto;
+import com.pengrad.telegrambot.response.SendResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +27,7 @@ public class ChangelogProvider extends AbstractProvider {
 
     @Override
     public CommandBotEnum getCommand() {
-        return CommandBotEnum.CHANGELOG;
+        return CHANGELOG;
     }
 
     /**
@@ -36,20 +40,34 @@ public class ChangelogProvider extends AbstractProvider {
     public void execute(@NotNull Message message) {
         if (permissionCheck(message)) {
             final var chatIds = chatService.getAllChatIds();
+            final var isPhoto = message.photo() != null && StringUtils.isNotEmpty(message.caption());
 
-            var changeLog = message.text().replace("/changelog", StringUtils.EMPTY).trim();
-
-            if (StringUtils.isNotEmpty(changeLog)) {
-                var successfulSending = 0;
-                for (var chatId : chatIds) {
-                    var request = new SendMessage(chatId, changeLog);
-                    var execute = telegramBot.execute(request);
+            var successfulSending = 0;
+            for (var chatId : chatIds) {
+                try {
+                    final var execute = sendChangeLog(message, chatId, isPhoto);
                     if (execute.isOk()) {
                         successfulSending++;
                     }
+                } catch (Exception e) {
+                    log.error("Ошибка отправка changelog в чат {}: {}", chatId, e.getMessage());
                 }
-                log.info("Changelog отправлен в {} чатов из {}", successfulSending, chatIds.size());
             }
+            log.info("Changelog отправлен в {} чатов из {}", successfulSending, chatIds.size());
+
+        }
+    }
+
+    private SendResponse sendChangeLog(Message message, Long chatId, boolean isPhoto) throws Exception {
+        if (isPhoto) {
+            final var fileUniqueId = message.photo()[message.photo().length - 1].fileId();
+            final var changeLog = message.caption().replace(CHANGELOG.getCommand(), StringUtils.EMPTY).trim();
+            final var sendPhoto = new SendPhoto(chatId, fileUniqueId).caption(changeLog);
+            return telegramBot.execute(sendPhoto);
+        } else {
+            var changeLog = message.text().replace(CHANGELOG.getCommand(), StringUtils.EMPTY).trim();
+            var sendMessage = new SendMessage(chatId, changeLog);
+            return telegramBot.execute(sendMessage);
         }
     }
 

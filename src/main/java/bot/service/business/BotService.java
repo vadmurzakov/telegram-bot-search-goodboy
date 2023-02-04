@@ -6,6 +6,7 @@ import bot.config.client.TelegramBotExecutor;
 import bot.entity.enums.CommandBotEnum;
 import bot.service.commands.CommandProvider;
 import com.pengrad.telegrambot.UpdatesListener;
+import com.pengrad.telegrambot.model.Message;
 import jakarta.annotation.PostConstruct;
 import java.util.Arrays;
 import java.util.List;
@@ -40,9 +41,8 @@ public class BotService {
     public void listener() {
         bot.setUpdatesListener(updates -> {
             for (var update : updates) {
-                // реагируем только на явные текстовые команды в чате, игнорируя другие события
-                if (update.message() != null && update.message().text() != null) {
-                    CommandBotEnum command = defineCommand(update.message().text());
+                if (update.message() != null) {
+                    CommandBotEnum command = defineCommand(update.message());
                     CommandProvider provider = commandProvidersMap.get(command);
                     try {
                         provider.execute(update.message());
@@ -75,23 +75,39 @@ public class BotService {
      *     <li>Если в перехватчике нет сообщения, провайдер будет определен {@code UnknownProvider.java} (справедливо для разных событий типа смены аватарки группы)</li>
      *     <li>Если по каким-то причинам мы не смогли найти подходящий провайдер, будет выбран {@code UnknownProvider.java}</li>
      *     <li>Если в сообщении содержится команда /changelog, она является приоритетной и провайдер будет определен как {@code ChangelogProvider.java}</li>
+     *     <li>Если message.text() пустой, возможно это пикча с описанием, обычно это сценарий для {@code ChangelogProvider.java}</li>
      * </ul>>
      *
-     * @param message текст сообщения который был перехвачен из чата.
+     * @param message {@link Message} объект содержащий всю метаинфу о том "кто", "что" и "откуда".
      * @return определяется тип команды и возвращается {@link CommandBotEnum}
      */
-    protected CommandBotEnum defineCommand(String message) {
-        if (StringUtils.isEmpty(message)) {
+    protected CommandBotEnum defineCommand(Message message) {
+        var text = message.text();
+        var isPhoto = message.photo() != null && StringUtils.isNotEmpty(message.caption());
+
+        // если прислали фото, проверяем есть ли в описании фото /changelog
+        if (StringUtils.isEmpty(text) && isPhoto) {
+            if (message.caption().contains(CommandBotEnum.CHANGELOG.getCommand())) {
+                return CommandBotEnum.CHANGELOG;
+            } else {
+                return CommandBotEnum.UNKNOWN;
+            }
+        }
+
+        // если это не фото и нет текста, сразу unknown
+        if (StringUtils.isEmpty(text)) {
             return CommandBotEnum.UNKNOWN;
         }
 
-        if (message.toUpperCase().contains(CommandBotEnum.CHANGELOG.name())) {
+        // если прислали текст и в нем есть /changelog - это CommandBotEnum.CHANGELOG
+        if (text.toUpperCase().contains(CommandBotEnum.CHANGELOG.name())) {
             return CommandBotEnum.CHANGELOG;
         }
 
+        // во всех остальных случаях ищем полное совпадение команды
         return Arrays.stream(CommandBotEnum.values())
-            .filter(e -> message.equalsIgnoreCase(e.getCommand()) ||
-                         message.equalsIgnoreCase(e.getCommand() + bot.properties().getUsername()))
+            .filter(e -> text.equalsIgnoreCase(e.getCommand()) ||
+                         text.equalsIgnoreCase(e.getCommand() + bot.properties().getUsername()))
             .findFirst()
             .orElse(CommandBotEnum.UNKNOWN);
     }
