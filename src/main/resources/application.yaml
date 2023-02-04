@@ -36,5 +36,5 @@ logging:
 
 telegram:
   token: ${TOKEN}
-  username: "@vmPidarBot"
+  username: ${BOT_USERNAME:@vmPidarBot}
   admin-id: 186736203

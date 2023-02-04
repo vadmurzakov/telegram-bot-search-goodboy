@@ -4,7 +4,7 @@ server:
 telegram:
   token: ${TOKEN}
   admin-id: 0
-  username: "@username_bot"
+  username: ${BOT_USERNAME:@username_bot}
 
 spring:
   jpa:
