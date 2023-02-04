@@ -1,4 +1,4 @@
-package bot.service.providers.impl;
+package bot.service.commands.providers;
 
 import bot.entity.domain.Stats;
 import bot.entity.enums.CommandBotEnum;
@@ -6,14 +6,14 @@ import bot.entity.enums.MessageTemplateEnum;
 import bot.service.business.MessageService;
 import bot.service.business.StatsService;
 import bot.service.business.UserService;
-import bot.service.providers.CommandProvider;
-import com.pengrad.telegrambot.TelegramBot;
+import bot.service.commands.AbstractProvider;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.text.MessageFormat;
 import java.util.Comparator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,10 +21,9 @@ import org.springframework.transaction.annotation.Transactional;
 @Component
 @Transactional
 @RequiredArgsConstructor
-public class StatsProvider implements CommandProvider {
+public class StatsProvider extends AbstractProvider {
     private final StatsService statsService;
     private final UserService userService;
-    private final TelegramBot telegramBot;
     private final MessageService messageService;
 
     private final static String ARCHI_PIDOR = "Главный архипидор только один {0}, а все остальные лишь его подсосы.";
@@ -40,7 +39,7 @@ public class StatsProvider implements CommandProvider {
      * @param message объект Message в рамках которого пришла команда на исполнение
      *                содержит в себе всю метаинформацию необходимую для выполнения команды
      */
-    public void execute(Message message) {
+    public void execute(@NotNull Message message) {
         final var chatId = message.chat().id();
         final var footer = messageService.randomMessage(MessageTemplateEnum.STATS);
 

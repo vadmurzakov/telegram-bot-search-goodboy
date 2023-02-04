@@ -1,4 +1,4 @@
-package bot.service.providers.impl;
+package bot.service.commands.providers;
 
 import bot.entity.domain.Stats;
 import bot.entity.domain.User;
@@ -7,24 +7,23 @@ import bot.entity.enums.MessageTemplateEnum;
 import bot.service.business.MessageService;
 import bot.service.business.StatsService;
 import bot.service.business.UserService;
-import bot.service.providers.CommandProvider;
-import com.pengrad.telegrambot.TelegramBot;
+import bot.service.commands.AbstractProvider;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class RegistrationProvider implements CommandProvider {
+public class RegistrationProvider extends AbstractProvider {
     private final UserService userService;
     private final StatsService statsService;
-    private final TelegramBot telegramBot;
     private final MessageService messageService;
 
     @Override
@@ -39,7 +38,7 @@ public class RegistrationProvider implements CommandProvider {
      *                содержит в себе всю метаинформацию необходимую для выполнения команды
      */
     @Override
-    public void execute(final Message message) {
+    public void execute(final @NotNull Message message) {
         final var chatId = message.chat().id();
         final var messageId = message.messageId();
         final var telegramUser = message.from();

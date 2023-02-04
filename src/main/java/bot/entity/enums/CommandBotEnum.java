@@ -1,39 +1,38 @@
 package bot.entity.enums;
 
-import java.util.Arrays;
-import org.apache.commons.lang3.StringUtils;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 
 /**
  * Список поддерживаемых команд для бота.
  */
+@Getter
+@AllArgsConstructor
 public enum CommandBotEnum {
     /**
      * Регистрация игрока в чате.
      */
-    REG,
+    REG("/reg"),
     /**
      * Запуск игры.
      */
-    GAME,
+    GAME("/game"),
     /**
      * Получение общей статистики по игрокам в чате.
      */
-    STATS,
+    STATS("/stats"),
     /**
      * Покинуть игру и не принимать в ней участие.
      */
-    LEAVE,
+    LEAVE("/leave"),
+    /**
+     * Отправка информации по новым фичам во все чаты.
+     */
+    CHANGELOG("/changelog"),
     /**
      * Неизвесная команда, ни как не обрабатывается.
      */
-    UNKNOWN;
+    UNKNOWN("/unknown");
 
-    public static CommandBotEnum from(String source) {
-        if (StringUtils.isEmpty(source)) return UNKNOWN;
-
-        return Arrays.stream(CommandBotEnum.values())
-            .filter(e -> source.toUpperCase().contains(e.name()))
-            .findFirst()
-            .orElse(UNKNOWN);
-    }
+    private final String command;
 }

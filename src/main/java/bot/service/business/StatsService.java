@@ -15,6 +15,10 @@ import org.springframework.stereotype.Service;
 public class StatsService {
     private final StatsRepository statsRepository;
 
+    public List<Stats> getAll() {
+        return statsRepository.findAll();
+    }
+
     public Optional<Stats> findStat(Long chatId, UUID userId) {
         return Optional.ofNullable(statsRepository.findByChatIdAndUserId(chatId, userId));
     }
