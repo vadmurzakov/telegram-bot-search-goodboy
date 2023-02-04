@@ -11,7 +11,6 @@ import bot.service.commands.AbstractProvider;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
 import com.pengrad.telegrambot.request.SendSticker;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -35,7 +34,7 @@ public class RegistrationProvider extends AbstractProvider {
     }
 
     /**
-     * {@inheritDoc}.
+     * Регистрация нового игрока в игре.
      *
      * @param message объект Message в рамках которого пришла команда на исполнение
      *                содержит в себе всю метаинформацию необходимую для выполнения команды
@@ -46,20 +45,20 @@ public class RegistrationProvider extends AbstractProvider {
         final var messageId = message.messageId();
         final var telegramUser = message.from();
 
-        final UUID userId = registrationUser(telegramUser);
-        registrationGameForUser(chatId, messageId, userId);
+        final var user = saveUser(telegramUser);
+        registrationGameForUser(chatId, messageId, user);
     }
 
     /**
-     * Регистрация пользователя.
-     * Если пользователь новый, то создается новый {@link User}, иначе возвращается id-существующего.
+     * Сохранение {@link User} в БД при необходимости,
+     * является единой сущностью для игры во всех чатах.
      *
      * @param telegramUser данные пользователя из телеграмма.
-     * @return идентификатор {@link User} из БД.
+     * @return {@link User} из БД.
      */
     @Nullable
-    private UUID registrationUser(com.pengrad.telegrambot.model.User telegramUser) {
-        final UUID userId;
+    private User saveUser(com.pengrad.telegrambot.model.User telegramUser) {
+        final User persistenceUser;
         var optionalUser = userService.findByUserTelegramId(telegramUser.id());
         if (optionalUser.isEmpty()) {
             var user = User.builder()
@@ -68,12 +67,11 @@ public class RegistrationProvider extends AbstractProvider {
                 .firstName(telegramUser.firstName())
                 .lastName(telegramUser.lastName())
                 .build();
-            var persistenceUser = userService.save(user);
-            userId = persistenceUser.getId();
+            persistenceUser = userService.save(user);
         } else {
-            userId = optionalUser.get().getId();
+            persistenceUser = optionalUser.get();
         }
-        return userId;
+        return persistenceUser;
     }
 
     /**
@@ -81,21 +79,21 @@ public class RegistrationProvider extends AbstractProvider {
      *
      * @param chatId    чат в котором нужно разегистрировать пользователя как игрока.
      * @param messageId идентификатор сообщения от пользователя, необходимо чтобы сделать reply ответа.
-     * @param userId    идентификатор существующего пользователя в БД.
+     * @param user      {@link User} из БД.
      */
-    private void registrationGameForUser(Long chatId, Integer messageId, UUID userId) {
-        var optionalStats = statsService.findStat(chatId, userId);
+    private void registrationGameForUser(Long chatId, Integer messageId, User user) {
+        var optionalStats = statsService.findStat(chatId, user.getId());
         if (optionalStats.isEmpty()) {
-            statsService.save(new Stats(chatId, userId));
+            statsService.save(new Stats(chatId, user.getId()));
             final var msg = messageService.randomMessage(MessageTemplateEnum.REGISTRATION);
             final var request = new SendSticker(chatId, msg).replyToMessageId(messageId);
             telegramBot.execute(request);
-            log.info("В чате id={} новый игрок id={}", chatId, userId);
+            log.info("В чате id={} новый игрок '{}'", chatId, user);
         } else {
             final var msg = messageService.randomMessage(MessageTemplateEnum.USER_ALREADY_PLAYING);
             final var request = new SendMessage(chatId, msg).replyToMessageId(messageId);
             telegramBot.execute(request);
-            log.info("Пользователь с id={} уже играет в чате с id={}", userId, chatId);
+            log.info("Пользователь '{}' уже играет в чате с id={}", user, chatId);
         }
     }
 

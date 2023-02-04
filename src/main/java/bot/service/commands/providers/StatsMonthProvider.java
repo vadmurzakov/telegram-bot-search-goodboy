@@ -49,40 +49,36 @@ public class StatsMonthProvider extends AbstractProvider {
      */
     @Override
     public void execute(@NotNull Message message) {
-        try {
-            final var chatId = message.chat().id();
-            final var stats = journalService.findAllByCurrentMonth(chatId);
-            final var groupByUserId = stats.stream().collect(Collectors.groupingBy(Journal::getUserId));
+        final var chatId = message.chat().id();
+        final var stats = journalService.findAllByCurrentMonth(chatId);
+        final var groupByUserId = stats.stream().collect(Collectors.groupingBy(Journal::getUserId));
 
-            final var sortGroupByUserId = groupByUserId
-                .entrySet().stream()
-                .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().size()))
-                .entrySet().stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
+        final var sortGroupByUserId = groupByUserId
+            .entrySet().stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().size()))
+            .entrySet().stream()
+            .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue, (e1, e2) -> e1, LinkedHashMap::new));
 
 
-            var index = 0;
-            var msg = new StringBuilder(header());
-            msg.append(opening()).append("\n");
-            for (var item : sortGroupByUserId.entrySet()) {
-                index++;
-                final var user = userService.findById(item.getKey());
-                final var countValue = item.getValue();
-                final var countName = MessagesUtils.declensionOfNumbers(countValue, "раз", "раза", "раз");
-                msg.append(TEMPLATE_LINE_USER.formatted(index, safetyHtml(user.toString()), countValue, countName));
-            }
+        var index = 0;
+        var msg = new StringBuilder(header());
+        msg.append(opening()).append("\n");
+        for (var item : sortGroupByUserId.entrySet()) {
+            index++;
+            final var user = userService.findById(item.getKey());
+            final var countValue = item.getValue();
+            final var countName = MessagesUtils.declensionOfNumbers(countValue, "раз", "раза", "раз");
+            msg.append(TEMPLATE_LINE_USER.formatted(index, safetyHtml(user.toString()), countValue, countName));
+        }
 
-            final var request = new SendMessage(chatId, msg.toString())
-                .parseMode(ParseMode.HTML)
-                .replyToMessageId(message.messageId());
-            final var execute = telegramBot.execute(request);
+        final var request = new SendMessage(chatId, msg.toString())
+            .parseMode(ParseMode.HTML)
+            .replyToMessageId(message.messageId());
+        final var execute = telegramBot.execute(request);
 
-            if (!execute.isOk()) {
-                log.error("Для команды {} вызов api.telegram.org закончился ошибкой: {}", getCommand(), execute.description());
-            }
-        } catch (Exception e) {
-            log.error("Обработка команды {} произошла с ошибкой: {}", getCommand(), e.getMessage());
+        if (!execute.isOk()) {
+            log.error("Для команды {} вызов api закончился ошибкой: {}", getCommand(), execute.description());
         }
     }
 

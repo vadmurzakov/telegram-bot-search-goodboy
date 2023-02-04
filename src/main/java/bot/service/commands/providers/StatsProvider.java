@@ -76,7 +76,7 @@ public class StatsProvider extends AbstractProvider {
             .replyToMessageId(message.messageId());
         final var execute = telegramBot.execute(request);
         if (!execute.isOk()) {
-            log.error("Для команды {} вызов api.telegram.org закончился ошибкой: {}", getCommand(), execute.description());
+            log.error("Для команды {} вызов api закончился ошибкой: {}", getCommand(), execute.description());
         }
     }
 

@@ -42,7 +42,7 @@ public class GameProvider extends AbstractProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * Запуск игры.
      *
      * @param message объект Message в рамках которого пришла команда на исполнение
      *                содержит в себе всю метаинформацию необходимую для выполнения команды

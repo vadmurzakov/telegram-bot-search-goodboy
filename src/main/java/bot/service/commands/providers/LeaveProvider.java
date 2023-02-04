@@ -26,21 +26,17 @@ public class LeaveProvider extends AbstractProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * Выйти из игры.
      *
      * @param message объект Message в рамках которого пришла команда на исполнение
      *                содержит в себе всю метаинформацию необходимую для выполнения команды
      */
     @Override
     public void execute(@NotNull Message message) {
-        try {
-            final var chatId = message.chat().id();
+        final var chatId = message.chat().id();
 
-            final var msg = messageService.randomMessage(MessageTemplateEnum.LEAVE);
-            final var request = new SendMessage(chatId, msg).replyToMessageId(message.messageId());
-            telegramBot.execute(request);
-        } catch (Exception e) {
-            log.error("Обработка команды {} произошла с ошибкой: {}", getCommand(), e.getMessage());
-        }
+        final var msg = messageService.randomMessage(MessageTemplateEnum.LEAVE);
+        final var request = new SendMessage(chatId, msg).replyToMessageId(message.messageId());
+        telegramBot.execute(request);
     }
 }

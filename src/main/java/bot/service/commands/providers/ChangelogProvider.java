@@ -6,7 +6,6 @@ import bot.service.commands.AbstractProvider;
 import com.pengrad.telegrambot.model.Chat;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
-import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -35,27 +34,22 @@ public class ChangelogProvider extends AbstractProvider {
      */
     @Override
     public void execute(@NotNull Message message) {
-        try {
-            if (permissionCheck(message)) {
-                Set<Long> chatIds = chatService.getAllChatIds();
-                log.debug("Список чатов где есть бот: " + chatIds);
+        if (permissionCheck(message)) {
+            final var chatIds = chatService.getAllChatIds();
 
-                var changeLog = message.text().replace("/changelog", StringUtils.EMPTY).trim();
+            var changeLog = message.text().replace("/changelog", StringUtils.EMPTY).trim();
 
-                if (StringUtils.isNotEmpty(changeLog)) {
-                    var successfulSending = 0;
-                    for (var chatId : chatIds) {
-                        var request = new SendMessage(chatId, changeLog);
-                        var execute = telegramBot.execute(request);
-                        if (execute.isOk()) {
-                            successfulSending++;
-                        }
+            if (StringUtils.isNotEmpty(changeLog)) {
+                var successfulSending = 0;
+                for (var chatId : chatIds) {
+                    var request = new SendMessage(chatId, changeLog);
+                    var execute = telegramBot.execute(request);
+                    if (execute.isOk()) {
+                        successfulSending++;
                     }
-                    log.info("Changelog отправен в {} чатов из {}", successfulSending, chatIds.size());
                 }
+                log.info("Changelog отправлен в {} чатов из {}", successfulSending, chatIds.size());
             }
-        } catch (Exception e) {
-            log.error("Не удалось отправить changelog: " + e.getMessage());
         }
     }
 

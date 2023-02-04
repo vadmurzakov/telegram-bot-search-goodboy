@@ -39,19 +39,19 @@ public class BotService {
     @PostConstruct
     public void listener() {
         bot.setUpdatesListener(updates -> {
-            try {
-                for (var update : updates) {
-                    // реагируем только на явные текстовые команды в чате, игнорируя другие события
-                    if (update.message() != null && update.message().text() != null) {
-                        CommandBotEnum command = defineCommand(update.message().text());
-                        commandProvidersMap.get(command).execute(update.message());
+            for (var update : updates) {
+                // реагируем только на явные текстовые команды в чате, игнорируя другие события
+                if (update.message() != null && update.message().text() != null) {
+                    CommandBotEnum command = defineCommand(update.message().text());
+                    CommandProvider provider = commandProvidersMap.get(command);
+                    try {
+                        provider.execute(update.message());
+                    } catch (Exception e) {
+                        log.error("Обработка команды {} произошла с ошибкой: {}", provider.getCommand(), e.getMessage());
                     }
                 }
-                return UpdatesListener.CONFIRMED_UPDATES_ALL;
-            } catch (Exception e) {
-                log.error("Неизвестная ошибка: ", e);
-                return UpdatesListener.CONFIRMED_UPDATES_ALL;
             }
+            return UpdatesListener.CONFIRMED_UPDATES_ALL;
         }, e -> {
         });
     }
