@@ -7,7 +7,9 @@ import bot.service.business.MessageService;
 import bot.service.business.StatsService;
 import bot.service.business.UserService;
 import bot.service.commands.AbstractProvider;
+import bot.util.MessagesUtils;
 import com.pengrad.telegrambot.model.Message;
+import com.pengrad.telegrambot.model.request.ParseMode;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.text.MessageFormat;
 import java.util.Comparator;
@@ -25,11 +27,11 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @RequiredArgsConstructor
 public class StatsProvider extends AbstractProvider {
+    private static final String ARCHI_PIDOR = "Главный архипидор только один {0}, а все остальные лишь его подсосы.";
+    private static final String TEMPLATE_LINE_USER = "%d. %s — <em>%d %s</em>\n";
     private final StatsService statsService;
     private final UserService userService;
     private final MessageService messageService;
-
-    private final static String ARCHI_PIDOR = "Главный архипидор только один {0}, а все остальные лишь его подсосы.";
 
     @Override
     public CommandBotEnum getCommand() {
@@ -37,14 +39,14 @@ public class StatsProvider extends AbstractProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * Получение и вывод статистики за все время.
      *
      * @param message объект Message в рамках которого пришла команда на исполнение
      *                содержит в себе всю метаинформацию необходимую для выполнения команды
      */
     public void execute(@NotNull Message message) {
         final var chatId = message.chat().id();
-        final var footer = messageService.randomMessage(MessageTemplateEnum.STATS);
+        final var opening = safetyHtml(messageService.randomMessage(MessageTemplateEnum.STATS));
 
         log.info("Запрос статистики в чате '{}'(idChat={})", message.chat().title(), message.chat().id());
 
@@ -53,21 +55,32 @@ public class StatsProvider extends AbstractProvider {
             .toList();
 
         var msg = new StringBuilder();
-        if (ARCHI_PIDOR.equals(footer)) {
+        if (ARCHI_PIDOR.equals(opening)) {
             var stats = statsList.get(0);
             var user = userService.findById(stats.getUserId());
-            msg.append(MessageFormat.format(footer, user.toString()));
+            msg.append(MessageFormat.format(opening, safetyHtml(user.toString())));
         } else {
-            msg.append(footer).append("\n");
+            msg.append(header());
+            msg.append(opening).append("\n");
             for (int i = 0; i < statsList.size(); i++) {
                 var stats = statsList.get(i);
                 var user = userService.findById(stats.getUserId());
-                msg.append(i + 1).append(") ").append(user.toString()).append(" ");
-                msg.append(stats.getCountRooster()).append(" раз(а)\n");
+                final var countValue = stats.getCountRooster().intValue();
+                final var countName = MessagesUtils.declensionOfNumbers(countValue, "раз", "раза", "раз");
+                msg.append(TEMPLATE_LINE_USER.formatted(i + 1, safetyHtml(user.toString()), countValue, countName));
             }
         }
 
-        final var sendMessage = new SendMessage(chatId, msg.toString()).replyToMessageId(message.messageId());
-        telegramBot.execute(sendMessage);
+        final var request = new SendMessage(chatId, msg.toString())
+            .parseMode(ParseMode.HTML)
+            .replyToMessageId(message.messageId());
+        final var execute = telegramBot.execute(request);
+        if (!execute.isOk()) {
+            log.error("Для команды {} вызов api.telegram.org закончился ошибкой: {}", getCommand(), execute.description());
+        }
+    }
+
+    private String header() {
+        return "<strong>Топсы за все время</strong>\n\n";
     }
 }

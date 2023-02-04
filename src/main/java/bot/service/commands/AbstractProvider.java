@@ -2,6 +2,7 @@ package bot.service.commands;
 
 import bot.config.client.TelegramBotExecutor;
 import com.pengrad.telegrambot.model.Message;
+import org.apache.commons.text.StringEscapeUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -33,5 +34,16 @@ public abstract class AbstractProvider implements CommandProvider {
      */
     protected boolean isAdmin(@NotNull Message message) {
         return message.from().id().equals(telegramBot.properties().getAdminId());
+    }
+
+    /**
+     * Безопасное представление строки в html-формате.
+     * Экранирует символы: {@code <, >, @, "}.
+     *
+     * @param source исходная строка.
+     * @return безопасная для html-строка.
+     */
+    protected String safetyHtml(String source) {
+        return StringEscapeUtils.escapeHtml4(source);
     }
 }

@@ -1,6 +1,6 @@
 package bot.service.commands.providers;
 
-import static bot.util.RandomUtil.generateRandomNumber;
+import static bot.util.RandomUtils.generateRandomNumber;
 
 import bot.entity.domain.Journal;
 import bot.entity.domain.Stats;

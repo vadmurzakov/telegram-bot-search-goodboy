@@ -22,6 +22,10 @@ public enum CommandBotEnum {
      */
     STATS("/stats"),
     /**
+     * Получение статистики за последний месяц.
+     */
+    STATS_MONTH("/stats_month"),
+    /**
      * Покинуть игру и не принимать в ней участие.
      */
     LEAVE("/leave"),

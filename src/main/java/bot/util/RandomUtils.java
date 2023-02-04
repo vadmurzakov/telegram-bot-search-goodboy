@@ -3,7 +3,7 @@ package bot.util;
 /**
  * Utility-Класс для генерации псевдослучайных чисел
  */
-public final class RandomUtil {
+public final class RandomUtils {
     /**
      * Возвращает рандомное число из диапазона [0, max)
      * @param max - верхняя планка рандомного числа

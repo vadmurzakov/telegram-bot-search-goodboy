@@ -1,7 +1,7 @@
 package bot.service.business;
 
 import static bot.entity.enums.MessageTemplateEnum.REGISTRATION;
-import static bot.util.RandomUtil.generateRandomNumber;
+import static bot.util.RandomUtils.generateRandomNumber;
 
 import bot.config.properties.MessageProperties;
 import bot.entity.enums.MessageTemplateEnum;
