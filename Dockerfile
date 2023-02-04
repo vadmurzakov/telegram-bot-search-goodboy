@@ -3,7 +3,7 @@ FROM openjdk:17-alpine3.14
 RUN apk add tzdata
 RUN mkdir /etc/localtime
 RUN cp /usr/share/zoneinfo/Europe/Moscow /etc/localtime
-echo "Europe/Brussels" >  /etc/timezone
+RUN echo "Europe/Brussels" >  /etc/timezone
 
 ENV APPLICATION_PORT=8040
 ENV TOKEN=TOKEN
