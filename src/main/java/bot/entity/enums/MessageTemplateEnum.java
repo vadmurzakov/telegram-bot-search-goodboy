@@ -8,5 +8,6 @@ public enum MessageTemplateEnum {
     REGISTRATION,
     USER_ALREADY_PLAYING,
     ROOSTER_WHO_CALLED,
+    LEAVE,
     ;
 }

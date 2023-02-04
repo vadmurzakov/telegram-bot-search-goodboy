@@ -18,6 +18,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
+/**
+ * Реализация провайдера для комады /reg
+ */
 @Slf4j
 @Component
 @RequiredArgsConstructor

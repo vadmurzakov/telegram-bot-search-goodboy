@@ -23,6 +23,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
+/**
+ * Реализация провайдера для комады /game
+ */
 @Slf4j
 @Component
 @AllArgsConstructor

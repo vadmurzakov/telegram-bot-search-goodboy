@@ -17,6 +17,9 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Реализация провайдера для комады /stats
+ */
 @Slf4j
 @Component
 @Transactional

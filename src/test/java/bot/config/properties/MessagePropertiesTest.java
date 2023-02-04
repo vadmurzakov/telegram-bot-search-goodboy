@@ -14,26 +14,32 @@ public class MessagePropertiesTest extends BootstrapApplicationTest {
     private MessageService service;
 
     @Test
-    public void getRoosterRandomMsg() {
-        final var randomMessage = service.randomMessage(MessageTemplateEnum.ROOSTER);
-        assertTrue(StringUtils.isNotEmpty(randomMessage));
+    void getRoosterRandomMsg() {
+        final var message = service.randomMessage(MessageTemplateEnum.ROOSTER);
+        assertTrue(StringUtils.isNotEmpty(message));
     }
 
     @Test
-    public void getAlreadyStartedRandomMsg() {
-        final var randomMessage = service.randomMessage(MessageTemplateEnum.ALREADY_STARTED);
-        assertTrue(StringUtils.isNotEmpty(randomMessage));
+    void getAlreadyStartedRandomMsg() {
+        final var message = service.randomMessage(MessageTemplateEnum.ALREADY_STARTED);
+        assertTrue(StringUtils.isNotEmpty(message));
     }
 
     @Test
-    public void getStatsRandomMsg() {
-        final var randomMessage = service.randomMessage(MessageTemplateEnum.STATS);
-        assertTrue(StringUtils.isNotEmpty(randomMessage));
+    void getStatsRandomMsg() {
+        final var message = service.randomMessage(MessageTemplateEnum.STATS);
+        assertTrue(StringUtils.isNotEmpty(message));
     }
 
     @Test
-    public void getNoActivePlayersRandomMsg() {
-        final var randomStatsMessage = service.randomMessage(MessageTemplateEnum.NO_ACTIVE_PLAYERS);
-        assertTrue(StringUtils.isNotEmpty(randomStatsMessage));
+    void getNoActivePlayersRandomMsg() {
+        final var message = service.randomMessage(MessageTemplateEnum.NO_ACTIVE_PLAYERS);
+        assertTrue(StringUtils.isNotEmpty(message));
+    }
+
+    @Test
+    void getLeaveRandomMsg() {
+        final var message = service.randomMessage(MessageTemplateEnum.LEAVE);
+        assertTrue(StringUtils.isNotEmpty(message));
     }
 }

@@ -14,7 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
 /**
- * Отправка во все чаты уведомлений о новых фичах бота.
+ * Реализация провайдера для комады /changelog
  */
 @Slf4j
 @Component
@@ -28,7 +28,7 @@ public class ChangelogProvider extends AbstractProvider {
     }
 
     /**
-     * {@inheritDoc}
+     * Отправка во все чаты уведомлений о новых фичах.
      *
      * @param message объект Message в рамках которого пришла команда на исполнение
      *                содержит в себе всю метаинформацию необходимую для выполнения команды
