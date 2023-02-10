@@ -19,6 +19,10 @@ public class JournalService {
         return repository.save(journal);
     }
 
+    public void delete(Journal journal) {
+        repository.delete(journal);
+    }
+
     /**
      * Получить всю статистику из чата за текущий месяц.
      *

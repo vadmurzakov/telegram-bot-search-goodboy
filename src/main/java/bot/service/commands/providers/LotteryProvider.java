@@ -2,11 +2,13 @@ package bot.service.commands.providers;
 
 import static bot.util.RandomUtils.generateRandomNumber;
 
+import bot.entity.domain.Journal;
 import bot.entity.domain.Lottery;
 import bot.entity.domain.Stats;
 import bot.entity.domain.User;
 import bot.entity.enums.CommandBotEnum;
 import bot.entity.enums.MessageTemplateEnum;
+import bot.service.business.JournalService;
 import bot.service.business.LotteryService;
 import bot.service.business.StatsService;
 import bot.service.commands.AbstractProvider;
@@ -35,6 +37,7 @@ public class LotteryProvider extends AbstractProvider {
 
     private final LotteryService lotteryService;
     private final StatsService statsService;
+    private final JournalService journalService;
 
     @Override
     public CommandBotEnum getCommand() {
@@ -121,10 +124,29 @@ public class LotteryProvider extends AbstractProvider {
             long newCountRooster = countRooster - Long.parseLong(bidValue);
             stat.setCountRooster(newCountRooster < 0 ? 0 : newCountRooster);
             resultLottery = messageService.randomMessage(MessageTemplateEnum.LOTTERY_WIN);
+
+            // убираем из журнала
+            var journals = journalService.findAllByCurrentMonth(stat.getChatId())
+                .stream()
+                .filter(e -> e.getUserId().equals(stat.getUserId()))
+                .toList()
+                .listIterator();
+
+            for (int i = 0; i < Long.parseLong(bidValue); i++) {
+                if (journals.hasNext()) {
+                    var journal = journals.next();
+                    journalService.delete(journal);
+                }
+            }
+
         } else {
             // fail
             stat.setCountRooster(countRooster + Long.parseLong(bidValue));
             resultLottery = messageService.randomMessage(MessageTemplateEnum.LOTTERY_FAIL);
+            // добавляем в журнал
+            for (int i = 0; i < Long.parseLong(bidValue); i++) {
+                journalService.save(new Journal(stat.getUserId(), stat.getChatId()));
+            }
         }
         statsService.save(stat);
         return resultLottery;
