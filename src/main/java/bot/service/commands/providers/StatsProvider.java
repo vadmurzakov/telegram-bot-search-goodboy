@@ -3,9 +3,7 @@ package bot.service.commands.providers;
 import bot.entity.domain.Stats;
 import bot.entity.enums.CommandBotEnum;
 import bot.entity.enums.MessageTemplateEnum;
-import bot.service.business.MessageService;
 import bot.service.business.StatsService;
-import bot.service.business.UserService;
 import bot.service.commands.AbstractProvider;
 import bot.util.MessagesUtils;
 import com.pengrad.telegrambot.model.Message;
@@ -30,8 +28,6 @@ public class StatsProvider extends AbstractProvider {
     private static final String ARCHI_PIDOR = "Главный архипидор только один {0}, а все остальные лишь его подсосы.";
     private static final String TEMPLATE_LINE_USER = "%d. %s — <em>%d %s</em>\n";
     private final StatsService statsService;
-    private final UserService userService;
-    private final MessageService messageService;
 
     @Override
     public CommandBotEnum getCommand() {
@@ -48,7 +44,7 @@ public class StatsProvider extends AbstractProvider {
         final var chatId = message.chat().id();
         final var opening = safetyHtml(messageService.randomMessage(MessageTemplateEnum.STATS));
 
-        log.info("Запрос статистики в чате '{}'(idChat={})", message.chat().title(), message.chat().id());
+        log.info("Запрос статистики за все время в чате '{}'(idChat={})", message.chat().title(), message.chat().id());
 
         var statsList = statsService.findStats(chatId).stream()
             .sorted(Comparator.comparingLong(Stats::getCountRooster).reversed())

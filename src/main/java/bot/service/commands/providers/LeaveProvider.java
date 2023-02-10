@@ -2,7 +2,6 @@ package bot.service.commands.providers;
 
 import bot.entity.enums.CommandBotEnum;
 import bot.entity.enums.MessageTemplateEnum;
-import bot.service.business.MessageService;
 import bot.service.commands.AbstractProvider;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -18,7 +17,6 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class LeaveProvider extends AbstractProvider {
-    private final MessageService messageService;
 
     @Override
     public CommandBotEnum getCommand() {

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
+
+    <changeSet id="09.02.2023-1" author="vmurzakov">
+        <createTable tableName="lottery">
+            <column name="id" type="UUID">
+                <constraints nullable="false" unique="true" primaryKey="true" primaryKeyName="pk_lottery"/>
+            </column>
+            <column name="chat_id" type="BIGINT" remarks="id чата в telegram">
+                <constraints nullable="false"/>
+            </column>
+            <column name="user_id" type="UUID" remarks="id пользователя">
+                <constraints nullable="false"/>
+            </column>
+            <column name="last_message_id" type="INTEGER" remarks="id последнего сообщения с запуском ставки"/>
+            <column name="last_day_run" type="DATE" remarks="Дата когда последний раз делалась ставка"/>
+        </createTable>
+    </changeSet>
+
+</databaseChangeLog>

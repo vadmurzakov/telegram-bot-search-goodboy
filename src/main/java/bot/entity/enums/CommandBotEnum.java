@@ -34,6 +34,10 @@ public enum CommandBotEnum {
      */
     CHANGELOG("/changelog"),
     /**
+     * Запуск лотереи.
+     */
+    LOTTERY("/lottery"),
+    /**
      * Неизвесная команда, ни как не обрабатывается.
      */
     UNKNOWN("/unknown");

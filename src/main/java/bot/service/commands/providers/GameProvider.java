@@ -7,9 +7,7 @@ import bot.entity.domain.Stats;
 import bot.entity.enums.CommandBotEnum;
 import bot.entity.enums.MessageTemplateEnum;
 import bot.service.business.JournalService;
-import bot.service.business.MessageService;
 import bot.service.business.StatsService;
-import bot.service.business.UserService;
 import bot.service.commands.AbstractProvider;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -32,8 +30,6 @@ import org.springframework.util.CollectionUtils;
 public class GameProvider extends AbstractProvider {
 
     private StatsService statsService;
-    private UserService userService;
-    private MessageService messageService;
     private JournalService journalService;
 
     @Override

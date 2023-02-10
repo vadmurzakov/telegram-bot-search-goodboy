@@ -83,4 +83,24 @@ public class ChangelogProvider extends AbstractProvider {
         boolean isAdmin = isAdmin(message);
         return message.chat().type() == Chat.Type.Private && isAdmin;
     }
+
+    /**
+     * {@inheritDoc}.
+     *
+     * @param message содержащий всю метаинформацию о сообщении из телеграмма.
+     * @return true если это CHANGELOG.
+     */
+    @Override
+    public boolean defineCommand(@NotNull Message message) {
+        var text = message.text();
+        var isPhoto = message.photo() != null && StringUtils.isNotEmpty(message.caption());
+
+        if (StringUtils.isEmpty(text) && isPhoto) {
+            if (message.caption().contains(CommandBotEnum.CHANGELOG.getCommand())) {
+                return true;
+            }
+        }
+
+        return text.toUpperCase().contains(CommandBotEnum.CHANGELOG.name());
+    }
 }

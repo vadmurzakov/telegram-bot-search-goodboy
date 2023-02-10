@@ -4,8 +4,6 @@ import bot.entity.domain.Journal;
 import bot.entity.enums.CommandBotEnum;
 import bot.entity.enums.MessageTemplateEnum;
 import bot.service.business.JournalService;
-import bot.service.business.MessageService;
-import bot.service.business.UserService;
 import bot.service.commands.AbstractProvider;
 import bot.util.DateTimeUtils;
 import bot.util.MessagesUtils;
@@ -33,8 +31,6 @@ public class StatsMonthProvider extends AbstractProvider {
     private static final String ARCHI_PIDOR = "Главный архипидор только один {0}, а все остальные лишь его подсосы.";
     private static final String TEMPLATE_LINE_USER = "%d. %s — <em>%d %s</em>\n";
     private final JournalService journalService;
-    private final UserService userService;
-    private final MessageService messageService;
 
     @Override
     public CommandBotEnum getCommand() {
@@ -52,6 +48,10 @@ public class StatsMonthProvider extends AbstractProvider {
         final var chatId = message.chat().id();
         final var stats = journalService.findAllByCurrentMonth(chatId);
         final var groupByUserId = stats.stream().collect(Collectors.groupingBy(Journal::getUserId));
+
+        final var currentNumberMonth = Calendar.getInstance(TimeZone.getDefault()).get(Calendar.MONTH);
+        final var nameMonth = DateTimeUtils.getNameMonth(currentNumberMonth);
+        log.info("Запрос статистики за {} в чате '{}'(idChat={})", nameMonth, message.chat().title(), chatId);
 
         final var sortGroupByUserId = groupByUserId
             .entrySet().stream()

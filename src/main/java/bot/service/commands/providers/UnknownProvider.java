@@ -5,6 +5,7 @@ import bot.service.commands.AbstractProvider;
 import com.pengrad.telegrambot.model.Message;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,13 @@ public class UnknownProvider extends AbstractProvider {
 
     @Override
     public void execute(@NotNull Message message) {
-        log.warn("Неизвестная команда '{}' от {}", message.text(), message.from().firstName());
+        Long chatId = message.chat().id();
+        String chatTitle = message.chat().title();
+        log.warn("В чате '{}'(id={}), неизвестная команда '{}' от {}", chatTitle, chatId, message.text(), message.from().firstName());
+    }
+
+    @Override
+    public boolean defineCommand(@NotNull Message message) {
+        return StringUtils.isEmpty(message.text());
     }
 }

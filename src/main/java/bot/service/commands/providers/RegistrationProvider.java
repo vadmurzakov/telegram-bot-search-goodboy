@@ -4,9 +4,7 @@ import bot.entity.domain.Stats;
 import bot.entity.domain.User;
 import bot.entity.enums.CommandBotEnum;
 import bot.entity.enums.MessageTemplateEnum;
-import bot.service.business.MessageService;
 import bot.service.business.StatsService;
-import bot.service.business.UserService;
 import bot.service.commands.AbstractProvider;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
@@ -14,7 +12,6 @@ import com.pengrad.telegrambot.request.SendSticker;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.springframework.stereotype.Component;
 
 /**
@@ -24,9 +21,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class RegistrationProvider extends AbstractProvider {
-    private final UserService userService;
     private final StatsService statsService;
-    private final MessageService messageService;
 
     @Override
     public CommandBotEnum getCommand() {
@@ -56,7 +51,7 @@ public class RegistrationProvider extends AbstractProvider {
      * @param telegramUser данные пользователя из телеграмма.
      * @return {@link User} из БД.
      */
-    @Nullable
+    @NotNull
     private User saveUser(com.pengrad.telegrambot.model.User telegramUser) {
         final User persistenceUser;
         var optionalUser = userService.findByUserTelegramId(telegramUser.id());

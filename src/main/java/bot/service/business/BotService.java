@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -41,13 +40,13 @@ public class BotService {
     public void listener() {
         bot.setUpdatesListener(updates -> {
             for (var update : updates) {
-                if (update.message() != null) {
+                if (update.message() != null && !update.message().from().isBot()) {
                     CommandBotEnum command = defineCommand(update.message());
                     CommandProvider provider = commandProvidersMap.get(command);
                     try {
                         provider.execute(update.message());
                     } catch (Exception e) {
-                        log.error("Обработка команды {} произошла с ошибкой: {}", provider.getCommand(), e.getMessage());
+                        log.error("Обработка команды {} произошла с ошибкой:", provider.getCommand(), e);
                     }
                 }
             }
@@ -83,25 +82,13 @@ public class BotService {
      */
     protected CommandBotEnum defineCommand(Message message) {
         var text = message.text();
-        var isPhoto = message.photo() != null && StringUtils.isNotEmpty(message.caption());
 
-        // если прислали фото, проверяем есть ли в описании фото /changelog
-        if (StringUtils.isEmpty(text) && isPhoto) {
-            if (message.caption().contains(CommandBotEnum.CHANGELOG.getCommand())) {
-                return CommandBotEnum.CHANGELOG;
-            } else {
-                return CommandBotEnum.UNKNOWN;
-            }
-        }
-
-        // если это не фото и нет текста, сразу unknown
-        if (StringUtils.isEmpty(text)) {
-            return CommandBotEnum.UNKNOWN;
-        }
-
-        // если прислали текст и в нем есть /changelog - это CommandBotEnum.CHANGELOG
-        if (text.toUpperCase().contains(CommandBotEnum.CHANGELOG.name())) {
-            return CommandBotEnum.CHANGELOG;
+        // прогоняем определение команды через AbstractProvider#defineComand
+        var commandProviderEntry = commandProvidersMap.entrySet().stream()
+            .filter(entry -> entry.getValue().defineCommand(message))
+            .findFirst();
+        if (commandProviderEntry.isPresent()) {
+            return commandProviderEntry.get().getValue().getCommand();
         }
 
         // во всех остальных случаях ищем полное совпадение команды

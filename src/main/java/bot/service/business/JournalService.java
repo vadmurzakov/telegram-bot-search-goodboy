@@ -29,7 +29,6 @@ public class JournalService {
         final var calendar = Calendar.getInstance(TimeZone.getDefault());
         final var month = calendar.get(Calendar.MONTH) + 1;
         final var year = calendar.get(Calendar.YEAR);
-        log.info("Запрос статистики из чата id={} за месяц {}/{}", chatId, month, year);
         return repository.findJournalByMonthAndYear(month, year, chatId);
     }
 }

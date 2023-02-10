@@ -6,5 +6,6 @@
 		http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
     <include file="01-migrate-data.xml" relativeToChangelogFile="true"/>
+    <include file="02-create-table-lottery.xml" relativeToChangelogFile="true"/>
 
 </databaseChangeLog>
