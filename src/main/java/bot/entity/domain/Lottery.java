@@ -38,5 +38,9 @@ public class Lottery extends Auditable<UUID> {
      * Номера выигрышных билетов.
      */
     private Set<Integer> tickets;
+    /**
+     * Ставка.
+     */
+    private Integer bid;
 }
 

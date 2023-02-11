@@ -11,11 +11,11 @@ class LotteryProviderTest {
     @Test
     void betweenDate() {
         LocalDate aDate = LocalDate.of(2023, 1, 29);
-        LocalDate bDate = LocalDate.now();
+        LocalDate bDate = LocalDate.of(2023, 2, 11);
 
         Period period = Period.between(aDate, bDate);
         int diff = Math.abs(period.getDays());
 
-        assertEquals(12, diff);
+        assertEquals(13, diff);
     }
 }

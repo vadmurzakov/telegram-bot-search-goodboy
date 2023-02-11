@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
 
@@ -35,11 +36,20 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class LotteryProvider extends AbstractProvider {
     private static final int LOTTERY_LAUNCH_PERIOD = 7;
+    private static final String CALLBACK_RUN_LOTTERY = "callbackLottery(run)";
     private static final InlineKeyboardMarkup INLINE_KEYBOARD_MARKUP = new InlineKeyboardMarkup(
         new InlineKeyboardButton("1").callbackData("callbackLottery(1)"),
         new InlineKeyboardButton("2").callbackData("callbackLottery(2)"),
-        new InlineKeyboardButton("3").callbackData("callbackLottery(3)")
+        new InlineKeyboardButton("3").callbackData("callbackLottery(3)"),
+        new InlineKeyboardButton("5").callbackData("callbackLottery(5)")
     );
+
+    private static final InlineKeyboardMarkup INLINE_KEYBOARD_MARKUP_WITH_RUN = new InlineKeyboardMarkup(
+        new InlineKeyboardButton("1").callbackData("callbackLottery(1)"),
+        new InlineKeyboardButton("2").callbackData("callbackLottery(2)"),
+        new InlineKeyboardButton("3").callbackData("callbackLottery(3)"),
+        new InlineKeyboardButton("5").callbackData("callbackLottery(5)")
+    ).addRow(new InlineKeyboardButton("Запуск").callbackData("callbackLottery(run)"));
 
     private final LotteryService lotteryService;
     private final StatsService statsService;
@@ -61,29 +71,26 @@ public class LotteryProvider extends AbstractProvider {
             log.info("[{}({})][{}] Запущена лотерея", chatTitle, chatId, user.get());
             var optionalLottery = lotteryService.findLottery(chatId, user.get().getId());
 
-            final var tickets = generateTickets();
             final var msgLotteryStart = messageService.randomMessage(MessageTemplateEnum.LOTTERY_RUN);
             final var sendMessage = new SendMessage(chatId,
-                MessageFormat.format(msgLotteryStart, safetyHtml(user.get().toString()), tickets))
+                MessageFormat.format(msgLotteryStart, safetyHtml(user.get().toString()), StringUtils.EMPTY))
                 .disableNotification(true)
                 .replyToMessageId(messageId)
                 .parseMode(ParseMode.HTML)
                 .replyMarkup(INLINE_KEYBOARD_MARKUP);
             final var startLotteryResponse = telegramBot.execute(sendMessage);
-            log.info("[{}({})][{}] Номера выигрышных билетов: {}", chatTitle, chatId, user.get(), tickets);
+            log.info("[{}({})][{}] Номера выигрышных билетов: {}", chatTitle, chatId, user.get(), StringUtils.EMPTY);
 
             if (optionalLottery.isEmpty()) {
                 var lottery = Lottery.builder()
                     .chatId(chatId)
                     .userId(user.get().getId())
                     .lastMessageId(startLotteryResponse.message().messageId())
-                    .tickets(tickets)
                     .build();
                 lotteryService.save(lottery);
             } else {
                 var lottery = optionalLottery.get();
                 lottery.setLastMessageId(startLotteryResponse.message().messageId());
-                lottery.setTickets(tickets);
                 lotteryService.update(lottery);
             }
         }
@@ -116,12 +123,30 @@ public class LotteryProvider extends AbstractProvider {
         final var whoseCallback = callbackQuery.from().id();
         final var whoseRate = callbackQuery.message().replyToMessage().from().id();
 
-        if (whoseRate.equals(whoseCallback)) {
+        if (whoseRate.equals(whoseCallback) && !callbackQuery.data().equals(CALLBACK_RUN_LOTTERY)) {
             var user = userService.getByTelegramId(whoseCallback);
             var lottery = lotteryService.getLottery(chatId, user.getId());
 
             final var bidValue = callbackQuery.data().replaceAll("\\D", "");
             log.info("[{}({})][{}] Ставка принята на {}", chatTitle, chatId, user, bidValue);
+
+            final var tickets = generateTickets(Integer.parseInt(bidValue));
+            log.info("[{}({})][{}] Номера выигрышных билетов: {}", chatTitle, chatId, user, tickets);
+
+            final var msgLotteryStart = messageService.randomMessage(MessageTemplateEnum.LOTTERY_RUN);
+            var editMessage = new EditMessageText(chatId, messageId,
+                MessageFormat.format(msgLotteryStart, safetyHtml(user.toString()), tickets))
+                .replyMarkup(new InlineKeyboardMarkup())
+                .parseMode(ParseMode.HTML)
+                .replyMarkup(INLINE_KEYBOARD_MARKUP_WITH_RUN);
+            telegramBot.execute(editMessage);
+
+            lottery.setTickets(tickets);
+            lottery.setBid(Integer.parseInt(bidValue));
+            lotteryService.update(lottery);
+        } else if (whoseRate.equals(whoseCallback) && callbackQuery.data().equals(CALLBACK_RUN_LOTTERY)) {
+            var user = userService.getByTelegramId(whoseCallback);
+            var lottery = lotteryService.getLottery(chatId, user.getId());
 
             deleteKeyboardFromOldLottery(callbackQuery.message());
 
@@ -131,12 +156,12 @@ public class LotteryProvider extends AbstractProvider {
             setLastDayRunLottery(lottery);
 
             var stat = statsService.getStat(chatId, user.getId());
-            var resultLottery = updStatsAndGetResultLottery(bidValue, lottery.getTickets(), diceValue, stat);
-            log.info("[{}({})][{}] {}", chatTitle, chatId, user, resultLottery);
+            var resultLottery = updStatsAndGetResultLottery(lottery.getBid(), lottery.getTickets(), diceValue, stat);
 
-            var request = new SendMessage(chatId, MessageFormat.format(resultLottery, user, bidValue))
+            var request = new SendMessage(chatId, MessageFormat.format(resultLottery, user, lottery.getBid()))
                 .disableNotification(true);
             telegramBot.execute(request);
+            log.info("[{}({})][{}] {}", chatTitle, chatId, user, MessageFormat.format(resultLottery, user, lottery.getBid()));
         } else {
             final var answerCallbackQuery = new AnswerCallbackQuery(callbackQuery.id())
                 .showAlert(true)
@@ -154,13 +179,13 @@ public class LotteryProvider extends AbstractProvider {
      * @param stat      данные статистики игрока.
      * @return результат статистики который необходимо отправить игроку.
      */
-    private String updStatsAndGetResultLottery(String bidValue, Set<Integer> tickets, Integer diceValue, Stats stat) {
+    private String updStatsAndGetResultLottery(Integer bidValue, Set<Integer> tickets, Integer diceValue, Stats stat) {
         var countRooster = stat.getCountRooster();
 
         String resultLottery;
         if (tickets.contains(diceValue)) {
             //win
-            long newCountRooster = countRooster - Long.parseLong(bidValue);
+            long newCountRooster = countRooster - bidValue;
             stat.setCountRooster(newCountRooster < 0 ? 0 : newCountRooster);
             resultLottery = messageService.randomMessage(MessageTemplateEnum.LOTTERY_WIN);
 
@@ -171,7 +196,7 @@ public class LotteryProvider extends AbstractProvider {
                 .toList()
                 .listIterator();
 
-            for (int i = 0; i < Long.parseLong(bidValue); i++) {
+            for (int i = 0; i < bidValue; i++) {
                 if (journals.hasNext()) {
                     var journal = journals.next();
                     journalService.delete(journal);
@@ -180,10 +205,10 @@ public class LotteryProvider extends AbstractProvider {
 
         } else {
             // fail
-            stat.setCountRooster(countRooster + Long.parseLong(bidValue));
+            stat.setCountRooster(countRooster + bidValue);
             resultLottery = messageService.randomMessage(MessageTemplateEnum.LOTTERY_FAIL);
             // добавляем в журнал
-            for (int i = 0; i < Long.parseLong(bidValue); i++) {
+            for (int i = 0; i < bidValue; i++) {
                 journalService.save(new Journal(stat.getUserId(), stat.getChatId()));
             }
         }
@@ -254,15 +279,24 @@ public class LotteryProvider extends AbstractProvider {
     }
 
     /**
-     * Генерирует рандомные 3 числа из диапазона [1,6]
+     * Генерирует рандомные числа из диапазона [1,6]
      * которые будут считать выигрышными билетами.
+     * Количество выигрышных билетов рассчитывается на основе ставки.
      *
+     * @param bid размер ставки
      * @return множество натуральных чисел из диапазона [1,6]
      */
     @NotNull
-    private Set<Integer> generateTickets() {
+    private Set<Integer> generateTickets(int bid) {
+        int countTickets = 0;
+        switch (bid) {
+            case 1 -> countTickets = 4;
+            case 2 -> countTickets = 3;
+            case 3 -> countTickets = 2;
+            case 5 -> countTickets = 1;
+        }
         var tickets = new HashSet<Integer>();
-        while (tickets.size() < 3) {
+        while (tickets.size() < countTickets) {
             tickets.add(generateRandomNumber(6) + 1);
         }
         return tickets;

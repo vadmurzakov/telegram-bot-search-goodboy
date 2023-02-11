@@ -12,7 +12,6 @@ public enum MessageTemplateEnum {
     ROOSTER_WHO_CALLED,
     LEAVE,
     LOTTERY_RUN,
-    LOTTERY_TICKET,
     LOTTERY_ALREADY_RUN,
     LOTTERY_FAIL,
     LOTTERY_WIN,
