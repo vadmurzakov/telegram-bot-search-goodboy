@@ -14,7 +14,6 @@ public enum MessageTemplateEnum {
     LOTTERY_RUN,
     LOTTERY_TICKET,
     LOTTERY_ALREADY_RUN,
-    LOTTERY_INCORRECT_BID,
     LOTTERY_FAIL,
     LOTTERY_WIN,
     ;

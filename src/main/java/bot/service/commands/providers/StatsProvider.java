@@ -53,14 +53,14 @@ public class StatsProvider extends AbstractProvider {
         var msg = new StringBuilder();
         if (ARCHI_PIDOR.equals(opening)) {
             var stats = statsList.get(0);
-            var user = userService.findById(stats.getUserId());
+            var user = userService.getById(stats.getUserId());
             msg.append(MessageFormat.format(opening, safetyHtml(user.toString())));
         } else {
             msg.append(header());
             msg.append(opening).append("\n");
             for (int i = 0; i < statsList.size(); i++) {
                 var stats = statsList.get(i);
-                var user = userService.findById(stats.getUserId());
+                var user = userService.getById(stats.getUserId());
                 final var countValue = stats.getCountRooster().intValue();
                 final var countName = MessagesUtils.declensionOfNumbers(countValue, "раз", "раза", "раз");
                 msg.append(TEMPLATE_LINE_USER.formatted(i + 1, safetyHtml(user.toString()), countValue, countName));
@@ -71,9 +71,6 @@ public class StatsProvider extends AbstractProvider {
             .parseMode(ParseMode.HTML)
             .replyToMessageId(message.messageId());
         final var execute = telegramBot.execute(request);
-        if (!execute.isOk()) {
-            log.error("Для команды {} вызов api закончился ошибкой: {}", getCommand(), execute.description());
-        }
     }
 
     private String header() {

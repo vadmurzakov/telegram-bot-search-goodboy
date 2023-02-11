@@ -66,7 +66,7 @@ public class StatsMonthProvider extends AbstractProvider {
         msg.append(opening()).append("\n");
         for (var item : sortGroupByUserId.entrySet()) {
             index++;
-            final var user = userService.findById(item.getKey());
+            final var user = userService.getById(item.getKey());
             final var countValue = item.getValue();
             final var countName = MessagesUtils.declensionOfNumbers(countValue, "раз", "раза", "раз");
             msg.append(TEMPLATE_LINE_USER.formatted(index, safetyHtml(user.toString()), countValue, countName));
@@ -76,10 +76,6 @@ public class StatsMonthProvider extends AbstractProvider {
             .parseMode(ParseMode.HTML)
             .replyToMessageId(message.messageId());
         final var execute = telegramBot.execute(request);
-
-        if (!execute.isOk()) {
-            log.error("Для команды {} вызов api закончился ошибкой: {}", getCommand(), execute.description());
-        }
     }
 
     private String opening() {

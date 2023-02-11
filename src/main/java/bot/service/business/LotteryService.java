@@ -30,4 +30,8 @@ public class LotteryService {
         return Optional.ofNullable(lotteryRepository.findByChatIdAndUserId(chatId, userId));
     }
 
+    public Lottery getLottery(Long chatId, UUID userId) {
+        return lotteryRepository.findByChatIdAndUserId(chatId, userId);
+    }
+
 }

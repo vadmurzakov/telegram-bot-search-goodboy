@@ -4,6 +4,7 @@ import bot.config.client.TelegramBotExecutor;
 import bot.entity.enums.MessageTemplateEnum;
 import bot.service.business.MessageService;
 import bot.service.business.UserService;
+import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Message;
 import com.pengrad.telegrambot.request.SendMessage;
 import org.apache.commons.text.StringEscapeUtils;
@@ -38,6 +39,16 @@ public abstract class AbstractProvider implements CommandProvider {
     }
 
     /**
+     * Дефолтная обработка коллбэка, если не требуется чего-то особенного.
+     *
+     * @param callbackQuery объект коллбэка содержащий всю метаинформацию,
+     *                      обычно коллбэк провоцирует нажатие InlineKeyboard
+     */
+    @Override
+    public void execute(@NotNull CallbackQuery callbackQuery) {
+    }
+
+    /**
      * Определить от кого пришло сообщение из чата.
      *
      * @param message сообщение из чата
@@ -65,7 +76,7 @@ public abstract class AbstractProvider implements CommandProvider {
      * @param message метаданые "откуда", "от кого", "что".
      * @return true - если пользователь зарегистрирован и доступ разрешен.
      */
-    protected boolean accessCheck(Message message) {
+    protected boolean checkAccess(Message message) {
         final var user = userService.findByUserTelegramId(message.from().id());
         if (user.isEmpty()) {
             final var msg = messageService.randomMessage(MessageTemplateEnum.USER_UNKNOWN);

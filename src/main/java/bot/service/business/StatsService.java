@@ -7,6 +7,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 @Slf4j
@@ -21,6 +22,11 @@ public class StatsService {
 
     public Optional<Stats> findStat(Long chatId, UUID userId) {
         return Optional.ofNullable(statsRepository.findByChatIdAndUserId(chatId, userId));
+    }
+
+    @NotNull
+    public Stats getStat(Long chatId, UUID userId) {
+        return statsRepository.findByChatIdAndUserId(chatId, userId);
     }
 
     public List<Stats> findStats(Long chatId) {

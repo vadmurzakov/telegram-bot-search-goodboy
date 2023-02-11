@@ -5,22 +5,25 @@ import static bot.util.RandomUtils.generateRandomNumber;
 import bot.entity.domain.Journal;
 import bot.entity.domain.Lottery;
 import bot.entity.domain.Stats;
-import bot.entity.domain.User;
 import bot.entity.enums.CommandBotEnum;
 import bot.entity.enums.MessageTemplateEnum;
 import bot.service.business.JournalService;
 import bot.service.business.LotteryService;
 import bot.service.business.StatsService;
 import bot.service.commands.AbstractProvider;
+import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Message;
-import com.pengrad.telegrambot.request.SendChatAction;
+import com.pengrad.telegrambot.model.request.InlineKeyboardButton;
+import com.pengrad.telegrambot.model.request.InlineKeyboardMarkup;
+import com.pengrad.telegrambot.model.request.ParseMode;
+import com.pengrad.telegrambot.request.AnswerCallbackQuery;
+import com.pengrad.telegrambot.request.EditMessageText;
 import com.pengrad.telegrambot.request.SendDice;
 import com.pengrad.telegrambot.request.SendMessage;
 import java.text.MessageFormat;
 import java.time.LocalDate;
 import java.time.Period;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,9 +34,12 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 public class LotteryProvider extends AbstractProvider {
-    private static final String EMOJI = "\uD83C\uDFB2";
     private static final int LOTTERY_LAUNCH_PERIOD = 7;
-    private static final Set<Integer> CORRECT_BID = Set.of(1, 2, 3);
+    private static final InlineKeyboardMarkup INLINE_KEYBOARD_MARKUP = new InlineKeyboardMarkup(
+        new InlineKeyboardButton("1").callbackData("callbackLottery(1)"),
+        new InlineKeyboardButton("2").callbackData("callbackLottery(2)"),
+        new InlineKeyboardButton("3").callbackData("callbackLottery(3)")
+    );
 
     private final LotteryService lotteryService;
     private final StatsService statsService;
@@ -49,59 +55,93 @@ public class LotteryProvider extends AbstractProvider {
         final var chatId = message.chat().id();
         final var chatTitle = message.chat().title();
         final var messageId = message.messageId();
-        final var messageReply = Optional.ofNullable(message.replyToMessage());
         final var user = userService.findByUserTelegramId(message.from().id());
 
-        if (accessCheck(message) && user.isPresent()) {
-
+        if (checkAccess(message) && user.isPresent()) {
+            log.info("[{}({})][{}] Запущена лотерея", chatTitle, chatId, user.get());
             var optionalLottery = lotteryService.findLottery(chatId, user.get().getId());
-            var lastLotteryMessage = optionalLottery.map(Lottery::getLastMessageId).orElse(null);
 
-            if (messageReply.isPresent() && messageReply.get().messageThreadId().equals(lastLotteryMessage)) {
-                final var bidValue = message.text();
+            final var tickets = generateTickets();
+            final var msgLotteryStart = messageService.randomMessage(MessageTemplateEnum.LOTTERY_RUN);
+            final var sendMessage = new SendMessage(chatId,
+                MessageFormat.format(msgLotteryStart, safetyHtml(user.get().toString()), tickets))
+                .disableNotification(true)
+                .replyToMessageId(messageId)
+                .parseMode(ParseMode.HTML)
+                .replyMarkup(INLINE_KEYBOARD_MARKUP);
+            final var startLotteryResponse = telegramBot.execute(sendMessage);
+            log.info("[{}({})][{}] Номера выигрышных билетов: {}", chatTitle, chatId, user.get(), tickets);
 
-                if (correctBid(bidValue)) {
-                    log.info("[{}({})][{}] Ставка на {}", chatTitle, chatId, user.get(), bidValue);
-
-                    var tickets = generateTickets();
-                    log.info("[{}({})][{}] Номера выигрышных билетов: {}", chatTitle, chatId, user.get(), tickets);
-
-                    sendTickets(chatId, user, tickets);
-                    final var diceValue = sendDice(messageId, chatId);
-                    log.info("[{}({})][{}] Лотерейный билет №{}", chatTitle, chatId, user.get(), diceValue);
-
-                    setLastDayRunLottery(optionalLottery);
-
-                    var stat = statsService.findStat(chatId, user.get().getId()).get();
-                    String resultLottery = updateStatsAndGetResultLottery(bidValue, tickets, diceValue, stat);
-
-                    var request = new SendMessage(chatId, MessageFormat.format(resultLottery, user.get(), bidValue))
-                        .disableNotification(true);
-                    telegramBot.execute(request);
-                } else {
-                    log.info("[{}({})][{}] Некорректная ставка '{}'", chatTitle, chatId, user.get(), bidValue);
-                    final var msg = messageService.randomMessage(MessageTemplateEnum.LOTTERY_INCORRECT_BID);
-                    telegramBot.execute(new SendMessage(chatId, msg).replyToMessageId(messageId));
-                }
+            if (optionalLottery.isEmpty()) {
+                var lottery = Lottery.builder()
+                    .chatId(chatId)
+                    .userId(user.get().getId())
+                    .lastMessageId(startLotteryResponse.message().messageId())
+                    .tickets(tickets)
+                    .build();
+                lotteryService.save(lottery);
             } else {
-                log.info("[{}({})][{}] Запущена лотерея", chatTitle, chatId, user.get());
-                final var lotteryStart = messageService.randomMessage(MessageTemplateEnum.LOTTERY_RUN);
-                final var sendMessage = new SendMessage(chatId, MessageFormat.format(lotteryStart, user.get()))
-                    .replyToMessageId(messageId)
-                    .disableNotification(true);
-                final var startLottery = telegramBot.execute(sendMessage);
-
-                final var messageThreadId = startLottery.message().messageThreadId();
-
-                if (optionalLottery.isEmpty()) {
-                    var lottery = new Lottery(chatId, user.get().getId(), messageThreadId);
-                    lotteryService.save(lottery);
-                } else {
-                    var lottery = optionalLottery.get();
-                    lottery.setLastMessageId(messageThreadId);
-                    lotteryService.update(lottery);
-                }
+                var lottery = optionalLottery.get();
+                lottery.setLastMessageId(startLotteryResponse.message().messageId());
+                lottery.setTickets(tickets);
+                lotteryService.update(lottery);
             }
+        }
+
+    }
+
+    /**
+     * Удаляем старое сообщение с начатой лотереей, т.к. были сгенерены новые тикеты.
+     *
+     * @param message метаинформация о сообщении которое надо отредактировать.
+     */
+    private void deleteKeyboardFromOldLottery(Message message) {
+        try {
+            final var chatId = message.chat().id();
+            final var messageId = message.messageId();
+            final var text = message.text();
+
+            var editMessage = new EditMessageText(chatId, messageId, text).replyMarkup(new InlineKeyboardMarkup());
+            telegramBot.execute(editMessage);
+        } catch (Exception e) {
+            log.warn("не смог удалить клавиатуру у messageId={}: {}", message.messageId(), e.getMessage());
+        }
+    }
+
+    @Override
+    public void execute(@NotNull CallbackQuery callbackQuery) {
+        final var chatId = callbackQuery.message().chat().id();
+        final var chatTitle = callbackQuery.message().chat().title();
+        final var messageId = callbackQuery.message().messageId();
+        final var whoseCallback = callbackQuery.from().id();
+        final var whoseRate = callbackQuery.message().replyToMessage().from().id();
+
+        if (whoseRate.equals(whoseCallback)) {
+            var user = userService.getByTelegramId(whoseCallback);
+            var lottery = lotteryService.getLottery(chatId, user.getId());
+
+            final var bidValue = callbackQuery.data().replaceAll("\\D", "");
+            log.info("[{}({})][{}] Ставка принята на {}", chatTitle, chatId, user, bidValue);
+
+            deleteKeyboardFromOldLottery(callbackQuery.message());
+
+            final var diceValue = sendDice(messageId, chatId);
+            log.info("[{}({})][{}] Лотерейный билет №{}", chatTitle, chatId, user, diceValue);
+
+            setLastDayRunLottery(lottery);
+
+            var stat = statsService.getStat(chatId, user.getId());
+            var resultLottery = updStatsAndGetResultLottery(bidValue, lottery.getTickets(), diceValue, stat);
+            log.info("[{}({})][{}] {}", chatTitle, chatId, user, resultLottery);
+
+            var request = new SendMessage(chatId, MessageFormat.format(resultLottery, user, bidValue))
+                .disableNotification(true);
+            telegramBot.execute(request);
+        } else {
+            final var answerCallbackQuery = new AnswerCallbackQuery(callbackQuery.id())
+                .showAlert(true)
+                .text("хуйню нажал, это не твоя ставка");
+            telegramBot.execute(answerCallbackQuery);
         }
     }
 
@@ -114,8 +154,7 @@ public class LotteryProvider extends AbstractProvider {
      * @param stat      данные статистики игрока.
      * @return результат статистики который необходимо отправить игроку.
      */
-    private String updateStatsAndGetResultLottery(String bidValue, Set<Integer> tickets, Integer diceValue,
-                                                  Stats stat) {
+    private String updStatsAndGetResultLottery(String bidValue, Set<Integer> tickets, Integer diceValue, Stats stat) {
         var countRooster = stat.getCountRooster();
 
         String resultLottery;
@@ -155,10 +194,9 @@ public class LotteryProvider extends AbstractProvider {
     /**
      * Установить дату последней игры в лотерею для игрока.
      *
-     * @param optionalLottery лотерейная сущность игрока.
+     * @param lottery лотерейная сущность игрока.
      */
-    private void setLastDayRunLottery(@NotNull Optional<Lottery> optionalLottery) {
-        var lottery = optionalLottery.get();
+    private void setLastDayRunLottery(@NotNull Lottery lottery) {
         lottery.setLastDayRun(LocalDate.now());
         lotteryService.update(lottery);
     }
@@ -172,7 +210,6 @@ public class LotteryProvider extends AbstractProvider {
      */
     private Integer sendDice(@NotNull Integer messageId, Long chatId) {
         var sendDice = new SendDice(chatId);
-        sendDice.emoji(EMOJI);
         sendDice.replyToMessageId(messageId);
         sendDice.disableNotification(true);
 
@@ -182,60 +219,33 @@ public class LotteryProvider extends AbstractProvider {
     }
 
     /**
-     * Отправка номера билетов которые будут выигрышными.
-     *
-     * @param chatId  куда отправлять
-     * @param user    для кого
-     * @param tickets номера выигрышных билетов.
-     */
-    private void sendTickets(Long chatId, @NotNull Optional<User> user, Set<Integer> tickets) {
-        final var msgTicket = messageService.randomMessage(MessageTemplateEnum.LOTTERY_TICKET);
-        final var request = new SendMessage(chatId, MessageFormat.format(msgTicket, user.get(), tickets.toString()))
-            .disableNotification(true);
-        telegramBot.execute(request);
-        telegramBot.execute(new SendChatAction(chatId, "typing"));
-        sleep(4000);
-    }
-
-    /**
-     * Проверка корректности ставки. Ставка должна быть от 1 до 2 очков.
-     *
-     * @param bidValue ставка пользователя.
-     * @return true - если все ок.
-     */
-    private boolean correctBid(String bidValue) {
-        try {
-            return CORRECT_BID.contains(Integer.parseInt(bidValue));
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    /**
      * Проверка что пользователь зарегистрирован в игре и лотерея запущена не чаще 1 раза в неделю.
      *
      * @param message метаданые "откуда", "от кого", "что".
      * @return true - если все ок и можно запускать лотерею.
      */
     @Override
-    protected boolean accessCheck(Message message) {
-        var accessCheck = super.accessCheck(message);
-        // если доступ к лотерее разрешен, дополнительно проверим не играл ли он в неё последнюю неделю
+    protected boolean checkAccess(Message message) {
+        var accessCheck = super.checkAccess(message);
+
+        // дополнительно проверим не играл ли он в лотерею последние LOTTERY_LAUNCH_PERIOD дней
         if (accessCheck) {
-            final var user = userService.findByUserTelegramId(message.from().id()).get();
+            final var user = userService.getByTelegramId(message.from().id());
             final var charId = message.chat().id();
             final var lottery = lotteryService.findLottery(charId, user.getId());
+
             if (lottery.isPresent() && lottery.get().getLastDayRun() != null) {
                 final var lastDayRun = lottery.get().getLastDayRun();
-                final var now = LocalDate.now();
 
-                var period = Period.between(lastDayRun, now);
+                var period = Period.between(lastDayRun, LocalDate.now());
                 var diff = Math.abs(period.getDays());
 
                 if (diff < LOTTERY_LAUNCH_PERIOD) {
                     final var msg = messageService.randomMessage(MessageTemplateEnum.LOTTERY_ALREADY_RUN);
-                    telegramBot.execute(new SendMessage(charId, MessageFormat.format(msg, lastDayRun)).replyToMessageId(
-                        message.messageId()));
+                    var request = new SendMessage(charId, MessageFormat.format(msg, lastDayRun))
+                        .replyToMessageId(message.messageId())
+                        .disableNotification(true);
+                    telegramBot.execute(request);
                     return false;
                 }
             }
@@ -286,7 +296,7 @@ public class LotteryProvider extends AbstractProvider {
             final var userId = message.from().id();
 
             if (message.replyToMessage() != null) {
-                final var replyMessageId = message.replyToMessage().messageThreadId();
+                final var replyMessageId = message.replyToMessage().messageId();
                 final var user = userService.findByUserTelegramId(userId);
                 if (user.isPresent()) {
                     final var lottery = lotteryService.findLottery(chatId, user.get().getId());

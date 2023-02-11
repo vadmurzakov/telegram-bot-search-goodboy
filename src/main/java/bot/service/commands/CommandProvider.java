@@ -1,6 +1,7 @@
 package bot.service.commands;
 
 import bot.entity.enums.CommandBotEnum;
+import com.pengrad.telegrambot.model.CallbackQuery;
 import com.pengrad.telegrambot.model.Message;
 import org.jetbrains.annotations.NotNull;
 
@@ -22,6 +23,14 @@ public interface CommandProvider {
      *                содержит в себе всю метаинформацию необходимую для выполнения команды
      */
     void execute(@NotNull Message message);
+
+    /**
+     * Обраотка коллбэка.
+     *
+     * @param callbackQuery объект коллбэка содержащий всю метаинформацию,
+     *                      обычно коллбэк провоцирует нажатие InlineKeyboard
+     */
+    void execute(@NotNull CallbackQuery callbackQuery);
 
     /**
      * Попытка определить к какому провайдеру относится данное сообщение.

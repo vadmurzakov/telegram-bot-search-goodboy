@@ -14,19 +14,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional
 @AllArgsConstructor
 public class UserService {
-
     private final UserRepository userRepository;
-
-    public User findByUsername(String username) {
-        return userRepository.findByUsername(username);
-    }
 
     public Optional<User> findByUserTelegramId(Long userTelegramId) {
         return Optional.ofNullable(userRepository.findByUserTelegramId(userTelegramId));
     }
 
-    public User findById(UUID id) {
+    public User getById(UUID id) {
         return userRepository.findUserById(id);
+    }
+
+    public User getByTelegramId(Long userTelegramId) {
+        return userRepository.findByUserTelegramId(userTelegramId);
     }
 
     public User save(User user) {

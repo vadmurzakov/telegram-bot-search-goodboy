@@ -61,7 +61,7 @@ public class GameProvider extends AbstractProvider {
         final var gameStartedToday = isGameStartedToday(statsList);
         if (gameStartedToday.isPresent()) {
             log.info("Для чата '{}'({}) игра уже запускалась", chatTitle, chatId);
-            final var user = userService.findById(gameStartedToday.get().getUserId());
+            final var user = userService.getById(gameStartedToday.get().getUserId());
             final var msg = MessageFormat.format(messageService.randomMessage(MessageTemplateEnum.ALREADY_STARTED), user.toString());
             final var request = new SendMessage(chatId, msg).replyToMessageId(messageId);
             telegramBot.execute(request);
@@ -69,7 +69,7 @@ public class GameProvider extends AbstractProvider {
             int randomRooster = generateRandomNumber(statsList.size());
 
             var stats = statsList.get(randomRooster);
-            final var user = userService.findById(stats.getUserId());
+            final var user = userService.getById(stats.getUserId());
             final String msg;
             if (user.getUserTelegramId().equals(message.from().id())) {
                 msg = MessageFormat.format(messageService.randomMessage(MessageTemplateEnum.ROOSTER_WHO_CALLED), user.toString());

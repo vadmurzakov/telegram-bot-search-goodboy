@@ -18,6 +18,9 @@
             </column>
             <column name="last_message_id" type="INTEGER" remarks="id последнего сообщения с запуском ставки"/>
             <column name="last_day_run" type="DATE" remarks="Дата когда последний раз делалась ставка"/>
+            <column name="tickets" type="INTEGER[]" remarks="Массив выигрышных билетов"/>
+            <column name="created_date" type="TIMESTAMP" remarks="time and date the entry was created"/>
+            <column name="last_modified_date" type="TIMESTAMP" remarks="time and date the entry was updated"/>
         </createTable>
     </changeSet>
 
