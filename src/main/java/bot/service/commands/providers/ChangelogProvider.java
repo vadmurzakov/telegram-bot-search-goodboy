@@ -93,14 +93,17 @@ public class ChangelogProvider extends AbstractProvider {
     @Override
     public boolean defineCommand(@NotNull Message message) {
         var text = message.text();
-        var isPhoto = message.photo() != null && StringUtils.isNotEmpty(message.caption());
+        if (StringUtils.isNotEmpty(text)) {
+            var isPhoto = message.photo() != null && StringUtils.isNotEmpty(message.caption());
 
-        if (StringUtils.isEmpty(text) && isPhoto) {
-            if (message.caption().contains(CommandBotEnum.CHANGELOG.getCommand())) {
-                return true;
+            if (StringUtils.isEmpty(text) && isPhoto) {
+                if (message.caption().contains(CommandBotEnum.CHANGELOG.getCommand())) {
+                    return true;
+                }
             }
-        }
 
-        return text.toUpperCase().contains(CommandBotEnum.CHANGELOG.name());
+            return text.toUpperCase().contains(CommandBotEnum.CHANGELOG.name());
+        }
+        return false;
     }
 }
