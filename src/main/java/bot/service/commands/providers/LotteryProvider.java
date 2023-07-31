@@ -67,7 +67,8 @@ public class LotteryProvider extends AbstractProvider {
         final var messageId = message.messageId();
         final var user = userService.findByUserTelegramId(message.from().id());
 
-        if (checkAccess(message) && user.isPresent()) {
+        // функционал лотереи выключен и будет удален позднее
+        if ("enabled".equals("false") && checkAccess(message) && user.isPresent()) {
             log.info("[{}({})][{}] Запущена лотерея", chatTitle, chatId, user.get());
             var optionalLottery = lotteryService.findLottery(chatId, user.get().getId());
 
