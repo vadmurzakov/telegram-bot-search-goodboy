@@ -5,6 +5,11 @@ services:
   goodboys-db:
     container_name: goodboys-db
     image: postgres:latest
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2'
+          memory: 256M
     healthcheck:
       test: [ "CMD", "pg_isready", "-q", "-d", "goodboys", "-U", "postgres" ]
       timeout: 45s
@@ -17,6 +22,11 @@ services:
 
   goodboys-app:
     container_name: goodboys-app
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 512M
     build:
       context: ./
       dockerfile: ./Dockerfile
