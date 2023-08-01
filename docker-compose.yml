@@ -22,14 +22,12 @@ services:
 
   goodboys-app:
     container_name: goodboys-app
+    image: imvad/telegram-bot-search-goodboy:2.5.1
     deploy:
       resources:
         limits:
           cpus: '0.5'
           memory: 512M
-    build:
-      context: ./
-      dockerfile: ./Dockerfile
     depends_on:
       - goodboys-db
     environment:
